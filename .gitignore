@@ -1,6 +1,7 @@
 *
 !.gitignore
 !README.md
+!CHANGELOG
 !4x4 matrices.txt
 !5x5 matrices.txt
 !*.py
