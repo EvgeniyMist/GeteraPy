@@ -1,0 +1,6 @@
+*
+!.gitignore
+!README.md
+!4x4 matrices.txt
+!5x5 matrices.txt
+!*.py
