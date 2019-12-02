@@ -263,7 +263,7 @@ def config_window():
     if window_num <= 8:
         globals()['config_lab' + str(window_num) + '_window']()
     else:
-        globals()[main, 'config_hw' + str(window_num - 8) + '_window']()
+        globals()['config_hw' + str(window_num - 8) + '_window']()
 
 
 def start_lab1():
