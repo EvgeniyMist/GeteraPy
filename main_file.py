@@ -140,8 +140,8 @@ def config_lab6_window():
     n.insert(0, '5')
     n.place(x=360, y=220) 
 
-    func = lambda: start_lab6(lab6_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod,
-                              gamma_cool, gamma_mod, n, a_left, a_right,
+    func = lambda: start_lab6(lab6_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool,
+                              mod, gamma_cool, gamma_mod, n, a_left, a_right,
                               a_delta)
 
     Button(lab6_w, width=15, text='Старт', bg='grey', command=func).place(x=220, y=445)
@@ -239,16 +239,21 @@ def config_lab7_window():
     n.insert(0, '5')
     n.place(x=390, y=390)
 
-    Label(lab7_w, text='Шаг циклов расчета выгорания, сут', bg='lightgrey').place(x=50, y=390)
+    Label(lab7_w, text='Шаг циклов расчета выгорания, сут', bg='lightgrey').place(x=50, y=400)
     step = Entry(lab7_w, width=15)
     step.insert(0, '0.25')
-    step.place(x=370, y=390)
+    step.place(x=370, y=400)
+
+    Label(lab7_w, text='Режим работы', bg='lightgrey').place(x=50, y=370)
+    mode = IntVar()
+    mode.set(0)
+    Radiobutton(lab7_w, text='1', variable=mode, value=1, bg='lightgrey').place(x=370, y=370)
+    Radiobutton(lab7_w, text='2', variable=mode, value=2, bg='lightgrey').place(x=430, y=370)
 
     func = lambda: start_lab7(lab7_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
-                              gamma_cool_korp, qv_korp,
-                              d_kan, δ_t_kan, D, δ_tr, N, x_kan, gamma_fuel_kan,
-                              cool, mod, gamma_cool_kan, gamma_mod, n, qv_kan,
-                              step)
+                              gamma_cool_korp, qv_korp, d_kan, δ_t_kan, D,
+                              δ_tr, N, x_kan, gamma_fuel_kan, cool, mod,
+                              gamma_cool_kan, gamma_mod, n, qv_kan, step, mode)
 
     Button(lab7_w, text='Старт', width=15, bg='grey', command=func).place(x=230, y=430)
 
@@ -256,11 +261,14 @@ def config_lab7_window():
 def config_lab8_window():
     pass
 
+
 def config_hw1_window():
     pass
 
+
 def config_hw2_window():
     pass
+
 
 def config_hw3_window():
     hw3_w = Toplevel(bg='lightgrey')
@@ -367,8 +375,8 @@ def start_lab4():
     pass
 
 
-def start_lab5 (lab5_w, d, δ_t, x, gamma_fuel, gamma_cool, R_left, R_right,
-                R_delta):
+def start_lab5(lab5_w, d, δ_t, x, gamma_fuel, gamma_cool, R_left, R_right,
+               R_delta):
     x_str = x.get()
     x_lst = x_str.split(', ')
     x_lst = list(map(float, x_lst))
@@ -376,11 +384,12 @@ def start_lab5 (lab5_w, d, δ_t, x, gamma_fuel, gamma_cool, R_left, R_right,
               float(gamma_fuel.get()), float(gamma_cool.get()),
               float(R_left.get())/10, float(R_right.get())/10,
               float(R_delta.get())/10)
-    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB5', parent=lab5_w)
+    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB5',
+                parent=lab5_w)
 
-def start_lab6(d, δ_t, D, δ_tr, N, x, gamma_fuel,
-               cool, mod, gamma_cool, gamma_mod, n,
-               a_left, a_right, a_delta):
+
+def start_lab6(lab6_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod,
+               gamma_cool, gamma_mod, n, a_left, a_right, a_delta):
     x_str = x.get()
     x_lst = x_str.split(', ')
     x_lst = list(map(float, x_lst))
@@ -391,44 +400,44 @@ def start_lab6(d, δ_t, D, δ_tr, N, x, gamma_fuel,
               float(gamma_fuel.get()), cool, mod, float(gamma_cool.get()),
               float(gamma_mod.get()), int(n.get()), float(a_left.get())/10,
               float(a_right.get())/10, float(a_delta.get())/10)
-    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB6', parent=lab6_w)
+    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB6',
+                parent=lab6_w)
     
 
-def start_lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp,
-               qv_korp,
-               d_kan, delta_kan, D, Delta, num_of_fuel_rods, x_kan,
-               gamma_fuel_kan, cool, mod, gamma_cool_kan, gamma_mod,
-               num_of_mod_rings, qv_kan,
-               step):
+def start_lab7(lab7_w, d_korp, delta_korp, x_korp, gamma_fuel_korp,
+               gamma_cool_korp, qv_korp, d_kan, delta_kan, D, Delta,
+               num_of_fuel_rods, x_kan, gamma_fuel_kan, cool, mod,
+               gamma_cool_kan, gamma_mod, num_of_mod_rings, qv_kan, step, mode):
     cool = 'h2o' if cool.get() == 1 else 'd2o'
     mod = 'c' if mod.get() == 1 else 'd2o'
     labs.lab7(float(d_korp.get())/10, float(delta_korp.get())/10,
-              float(x_korp.get()), float(gamma_fuel_korp.get()),
+              float(x_korp.get()), float(gamma_fuel_korp.get()),    
               float(gamma_cool_korp.get()), float(qv_korp.get()),
-
               float(d_kan.get())/10, float(delta_kan.get())/10,
               float(D.get())/10, float(Delta.get())/10,
               int(num_of_fuel_rods.get()), float(x_kan.get()),
               float(gamma_fuel_kan.get()), cool, mod,
               float(gamma_cool_kan.get()), float(gamma_mod.get()),
               int(num_of_mod_rings.get()), float(qv_kan.get()),
-
-              float(step.get()))
-    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB7', parent=lab7_w)
+              float(step.get()), mode.get())
+    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB7',
+                parent=lab7_w)
 
 
 def start_lab8():
     pass
 
+
 def start_hw1():
     pass
+
 
 def start_hw2():
     pass
 
-def start_hw3(d, δ_t, D, δ_tr, N, x, gamma_fuel,
-               cool, mod, gamma_cool, gamma_mod, n,
-               a_left, a_right, a_delta):
+
+def start_hw3(hw3, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod, gamma_cool,
+              gamma_mod, n, a_left, a_right, a_delta):
     x_str = x.get()
     x_lst = x_str.split(', ')
     x_lst = list(map(float, x_lst))
@@ -439,10 +448,13 @@ def start_hw3(d, δ_t, D, δ_tr, N, x, gamma_fuel,
               float(gamma_fuel.get()), cool, mod, float(gamma_cool.get()),
               float(gamma_mod.get()), int(n.get()), float(a_left.get())/10,
               float(a_right.get())/10, float(a_delta.get())/10)
-    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\HW3', parent=hw3_w)
+    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\HW3',
+                parent=hw3_w)
+
 
 def start_hw4():
     pass
+
 
 # создание главного окна и задание его параметров
 root = Tk()

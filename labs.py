@@ -1,5 +1,5 @@
 from subprocess import run
-from numpy import argmax, arange, pi, exp
+from numpy import argmax, arange, pi, exp, concatenate
 
 
 import constants as const
@@ -64,7 +64,7 @@ def lab6(d, delta, D, Delta, num_of_fuel_rods, x_lst, gamma_fuel,
 def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
          d_kan, delta_kan, D, Delta, num_of_fuel_rods, x_kan, gamma_fuel_kan,
          cool, mod, gamma_cool_kan, gamma_mod, num_of_mod_rings, qv_kan,
-         time_step):
+         time_step, mode):
     def after_stop(time_array, flux, rho_array):
         time_array *= 3600*24
         exp_xe = exp(-const.lambda_xe * time_array)
@@ -93,30 +93,35 @@ def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
                      gamma_fuel_kan, cool, mod, gamma_cool_kan,
                      gamma_mod, num_of_mod_rings)[0]
     fuel_compos_korp = const.uo2_composition(x_korp, gamma_fuel_korp)
-    cool_compos_korp = getattr(const, cool+'_composition')(gamma_cool_korp)
+    cool_compos_korp = getattr(const, 'h2o_composition')(gamma_cool_korp)
     fuel_compos_kan = const.uo2_composition(x_kan, gamma_fuel_kan)
     cool_compos_kan = getattr(const, cool+'_composition')(gamma_cool_kan)
     mod_compos = getattr(const, mod+'_composition')(gamma_mod)
-    for commands in [command1, command2]:
-        key1, key2 = 'Корпусной', 'Канальный'
-        result_dict = {}
-        result_dict[key1] = {'K': []}
-        result_dict[key2] = {'K': []}
-        file_in = open('lab5.txt', 'w')
-        korp.create_file(file_in, d_korp, delta_korp, r_opt_korp,
-                         fuel_compos_korp, cool_compos_korp,
-                         commands(qv_korp, time_step))
-        config('5')
-        run('getera.exe')
-        find_coeff('lab5.out', result_dict[key1])
-        find_concent('lab5.out', result_dict[key1])
-        file_in = open('lab6.txt', 'w')
-        kan.create_file(file_in, d_kan, delta_kan, r_opt_kan, D, Delta,
-                        num_of_fuel_rods, num_of_mod_rings, fuel_compos_kan,
-                        cool_compos_kan, mod_compos,
-                        commands(qv_kan, time_step))
-        config('6')
-        run('getera.exe')
-        find_coeff('lab6.out', result_dict[key2])
-        find_concent('lab6.out', result_dict[key2])
-        draw('7', arange(0, 5, time_step), result_dict, 'Время, сут')
+    key1, key2 = 'Корпусной', 'Канальный'
+    k_dict = {key1: {'K': []}, key2: {'K': []}}
+    xe_dict = {key1: {'xe35': []}, key2: {'xe35': []}}
+    file_in = open('lab5.txt', 'w')
+    korp.create_file(file_in, d_korp, delta_korp, r_opt_korp,
+                     fuel_compos_korp, cool_compos_korp,
+                     locals()['command'+str(mode)](qv_korp, time_step))
+    config('5')
+    run('getera.exe')
+    find_coeff('lab5.out', k_dict[key1])
+    find_concent('lab5.out', xe_dict[key1])
+    file_in = open('lab6.txt', 'w')
+    kan.create_file(file_in, d_kan, delta_kan, r_opt_kan, D, Delta,
+                    num_of_fuel_rods, num_of_mod_rings, fuel_compos_kan,
+                    cool_compos_kan, mod_compos,
+                    locals()['command'+str(mode)](qv_kan, time_step))
+    config('6')
+    run('getera.exe')
+    find_coeff('lab6.out', k_dict[key2])
+    find_concent('lab6.out', xe_dict[key2])
+    time_array = arange(0, 2, time_step/10)
+    for concent in after_stop(time_array, 10**13, xe_dict[key1]['xe35']):
+        xe_dict[key1]['xe35'].append(concent)
+    for concent in after_stop(time_array, 7*10**12, xe_dict[key2]['xe35']):
+        xe_dict[key2]['xe35'].append(concent)
+    draw('7', arange(0, 5, time_step), k_dict, 'Время, сут')
+    draw('7', concatenate((arange(0, 5, time_step), arange(5, 7, time_step/10))),
+         xe_dict, 'Время, сут')

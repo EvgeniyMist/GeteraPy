@@ -4,7 +4,8 @@ from os import getcwd
 
 tex_dict = {'K': r'$K_{eff}$', 'Phi': r'$\varphi$', 'Theta': r'$\theta$',
             'AbsFuel': r'$\Sigma_a^{топ}$', 'FisFuel': r'$\Sigma_f^{топ}$',
-            'AbsMod': r'$\Sigma_a^{зам}$'}
+            'AbsMod': r'$\Sigma_a^{зам}$', 'xe35': r'$Xe^{35}$'}
+izotops = {'xe35'}
 
 
 def config(num):
@@ -37,12 +38,50 @@ def find_coeff(name_of_file, result_dict):
             if 'Theta' in result_dict:
                 result_dict['Theta'].append(float(help_list[4]))
             flag = False
-        if 'keff' in line.split():
+        elif 'keff' in line.split():
             flag = True
 
 
 def find_concent(name_of_file, result_dict):
-    pass
+    def calcul_mean(lst):
+        mean_value = sum([(i + 1)*lst[i] for i in range(len(lst))])
+        mean_value /= sum([i + 1 for i in range(len(lst))])
+        return mean_value
+
+    def normalize(result_dict):
+        for izotop in izotops:
+            if izotop in result_dict:
+                max_c = max(result_dict[izotop])
+                result_dict[key] = list(map(lambda c: c / max_c,
+                                            result_dict[izotop]))
+
+    out_file = open(name_of_file, 'r')
+    flag_out_data = False
+    flag_corr_data = False
+    concent_dict = {}
+    for line in out_file:
+        if flag_out_data:
+            if flag_corr_data:
+                help_list = line.split()
+                for key in result_dict:
+                    if key in help_list:
+                        if key not in concent_dict:
+                            concent_dict[key] = []
+                        concent_dict[key].append(float(help_list[2]))
+            if line[:5] == ':corr':
+                # фиксируем начало вывода результата команды corr
+                flag_corr_data = True
+            elif line[0] == ':':
+                # фиксируем окончание вывода результата команды corr
+                flag_corr_data = False
+                # обрабатываем найденные концентрации
+                for key in concent_dict:
+                    result_dict[key].append(calcul_mean(concent_dict[key]))
+                concent_dict = {}
+        elif line[:5] == ':stop':
+            # фиксируем окончание перечисления входных данных
+            flag_out_data = True
+    normalize(result_dict)
 
 
 def find_macro(name_of_file, result_dict):
