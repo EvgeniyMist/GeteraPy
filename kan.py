@@ -7,6 +7,7 @@ from commands import write_commands
 
 def before_concent(file_in, d, delta, R, D, Delta, num_of_fuel_rods,
                    num_of_mod_rings):
+
     def moderator(file_in, num, D, Delta, num_of_mod_rings):
         r_array = linspace(D/2, R, num_of_mod_rings+1)
         input_str = ' rcel(1,'+str(num)+')='
@@ -62,6 +63,7 @@ def concent(file_in, fuel_compos, coolant_compos, mod_compos):
 
 def after_concent(file_in, fuel_compos, coolant_compos, mod_compos,
                   num_of_fuel_rods):
+
     def add_dicts(*dicts):
         result = {}
         for d in dicts:

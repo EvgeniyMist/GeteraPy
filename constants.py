@@ -1,25 +1,22 @@
-def uo2_composition(x, gamma):
-    if gamma is None:
-        gamma = 10.97
+def uo2_composition(x_u, x_pu=0, gamma=10.97):
     N0_uo2 = param_uo2*gamma
-    return {'u238': N0_uo2*(1-x), 'u235': N0_uo2*x, 'o': N0_uo2*2}
+    compos = {'u238': N0_uo2*(1-x_u-x_pu), 'u235': N0_uo2*x_u, 'o': N0_uo2*2}
+    if x_pu != 0:
+        compos.update({'pu39': N0_uo2*x_pu})
+    return compos
 
 
-def h2o_composition(gamma):
-    if gamma is None:
-        gamma = 1.0
+def h2o_composition(gamma=1.0):
     N_h2o = param_h2o*gamma
     return {'h': 2*N_h2o, 'o': N_h2o}
 
 
-def d2o_composition(gamma):
-    if gamma is None:
-        gamma = 1.1
+def d2o_composition(gamma=1.1):
     N_d2o = param_d2o*gamma
     return {'d': 2*N_d2o, 'o': N_d2o}
 
 
-def c_composition(gamma):
+def c_composition(gamma=2.1):
     return {'c': gamma*param_c}
 
 
