@@ -6,28 +6,26 @@ from commands import write_commands
 
 
 def before_concent(file_in, d, delta, R, D, Delta, num_of_fuel_rods,
-                   num_of_mod_rings):
+                   num_of_mod_rings, mod):
 
-    def moderator(file_in, num, D, Delta, num_of_mod_rings):
-        r_array = linspace(D/2, R, num_of_mod_rings+1)
-        input_str = ' rcel(1,'+str(num)+')='
+    def moderator(file_in, num, D, Delta, n):
+        r_array = linspace(D/2, R, n+1)
+        input_str = '  rcel(1, %d) = ' % num
         for r in r_array:
-            input_str += str(round(r, 5)) + ','
-        input_str += 'rcin('+str(num)+')=' + str(round(D/2 - Delta, 5)) + ',\n'
+            input_str += '{:.3f}, '.format(r)
+        input_str += 'rcin({}) = {:.3f},\n'.format(num, D/2 - Delta)
         file_in.write(input_str)
-        file_in.write(' ncelsos(1,'+str(num)+')=2,' +
-                      '4,'*num_of_mod_rings + '\n')
+        file_in.write(('  ncelsos(1, %d) = 2, ' + '4, '*n + '\n') % num)
 
     def fuel_rod(file_in, num, d, delta, r_ex):
-        radii = ','.join(map(str, [round(d/2 - delta, 5), round(d/2, 5),
-                                   round(r_ex, 5)]))
-        file_in.write(' rcel(1,'+str(num)+')=' + radii + '\n')
-        file_in.write(' ncelsos(1,'+str(num)+')=1,2,3,\n')
+        radii = ('{:.3f}, '*3).format(d/2 - delta, d/2, r_ex)
+        file_in.write(('  rcel(1, %d) = ' + radii + '\n') % num)
+        file_in.write('  ncelsos(1, %d) = 1, 2, 3,\n' % num)
 
     file_in.write(':poly\n')
     file_in.write(' &vvod\n')
-    file_in.write(' rcel(1,1)=' + str(round(d/2, 5)) + '\n')
-    file_in.write(' ncelsos(1,1)=2,\n')
+    file_in.write('  rcel(1, 1) = {:.3f},\n'.format(d/2))
+    file_in.write('  ncelsos(1, 1) = 2,\n')
     S = pi*(D/2 - Delta)**2  # площадь ТВС
     S /= (num_of_fuel_rods + 1)  # площадь, принадлежащая одному стержню
     # S = pi*r_ex^2
@@ -39,26 +37,29 @@ def before_concent(file_in, d, delta, R, D, Delta, num_of_fuel_rods,
     elif num_of_fuel_rods == 36:
         fuel_rod(file_in, 4, d, delta, r_ex)
         moderator(file_in, 5, D, Delta, num_of_mod_rings)
-    file_in.write(' t=1773.0, 543.0, 543.0, 873.0\n')
-    file_in.write(' troiz=\n')
+    #########################################################
+    if 'c' in mod:
+        file_in.write('  t = 1773.0, 543.0, 543.0, 873.0,\n')
+    else:
+        file_in.write('  t = 1773.0, 543.0, 543.0, 323.0,\n')
+    #########################################################
+    file_in.write('  troiz =\n')
 
 
 def concent(file_in, fuel_compos, coolant_compos, mod_compos):
     for izotop in fuel_compos:
-        file_in.write(' ' + str(round(fuel_compos[izotop], 5)) +
-                      ', 0.0, 0.0, 0.0,\n')
-    file_in.write(' 0.0, ' + str(round(N_zr, 5)) + ', 0.0, 0.0,\n')
+        file_in.write('   %e, 0.0, 0.0, 0.0,\n' % fuel_compos[izotop])
+    file_in.write('   0.0, %e, 0.0, 0.0,\n' % N_zr)
     for izotop in coolant_compos:
-        input_str = ' 0.0, 0.0, ' + str(round(coolant_compos[izotop], 5))
+        input_str = '   0.0, 0.0, %e' % coolant_compos[izotop]
         if izotop in mod_compos:
-            input_str += ', ' + str(round(mod_compos[izotop], 5)) + ',\n'
+            input_str += ', %e,\n' % mod_compos[izotop]
         else:
             input_str += ', 0.0,\n'
         file_in.write(input_str)
     for izotop in mod_compos:
         if izotop not in coolant_compos:
-            file_in.write(' 0.0, 0.0, 0.0, ' +
-                          str(round(mod_compos[izotop], 5)) + ',\n')
+            file_in.write('   0.0, 0.0, 0.0, %e,\n' % mod_compos[izotop])
 
 
 def after_concent(file_in, fuel_compos, coolant_compos, mod_compos,
@@ -71,18 +72,18 @@ def after_concent(file_in, fuel_compos, coolant_compos, mod_compos,
         return result
 
     if num_of_fuel_rods == 18:
-        file_in.write(' ntcell=1,2,3,4,\n')
-        krat_str = ' krat=1.,6.,12.,1.,\n'
+        file_in.write('  ntcell = 1, 2, 3, 4,\n')
+        krat_str = '  krat = 1, 6, 12, 1,\n'
         matrices = open('4x4 matrices.txt')
     elif num_of_fuel_rods == 36:
-        file_in.write(' ntcell=1,2,3,4,5,\n')
-        krat_str = ' krat=1.,6.,12.,18.,1.,\n'
+        file_in.write(' ntcell = 1, 2, 3, 4, 5,\n')
+        krat_str = '  krat = 1, 6, 12, 18, 1,\n'
         matrices = open('5x5 matrices.txt')
     file_in.write(krat_str)
     for line in matrices:
         file_in.write(line)
-    file_in.write(" material(1)='chmc',\n")
-    file_in.write('&end\n')
+    file_in.write("  material(1)='chmc',\n")
+    file_in.write(' &end\n')
     for izotop in fuel_compos:
         file_in.write(izotop + '\n')
     file_in.write('zr\n')
@@ -97,7 +98,7 @@ def create_file(file_in, d, delta, R, D, Delta, num_of_fuel_rods,
                 num_of_mod_rings, fuel_compos, coolant_compos, mod_compos,
                 commands):
     before_concent(file_in, d, delta, R, D, Delta, num_of_fuel_rods,
-                   num_of_mod_rings)
+                   num_of_mod_rings, mod_compos.keys())
     concent(file_in, fuel_compos, coolant_compos, mod_compos)
     after_concent(file_in, fuel_compos, coolant_compos, mod_compos,
                   num_of_fuel_rods)

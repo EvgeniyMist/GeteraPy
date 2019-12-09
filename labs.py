@@ -22,11 +22,11 @@ def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, R_left, R_right, R_delta):
             file_in = open('lab5.txt', 'w')
             korp.create_file(file_in, d, delta, R, fuel_compos,
                              cool_compos, [command('fier', None),
-                                           command('macro', '1,2,3,')])
+                                           command('macro', '1, 2, 3,')])
             run('getera.exe')
             find_coeff('lab5.out', result_dict[key])
             find_macro('lab5.out', result_dict[key])
-    draw('5', R_array, result_dict, 'Шаг решетки, см')
+    draw('Lab5', R_array, result_dict, 'Шаг решетки, см')
 
 
 def lab6(d, delta, D, Delta, num_of_fuel_rods, x_lst, gamma_fuel,
@@ -39,7 +39,8 @@ def lab6(d, delta, D, Delta, num_of_fuel_rods, x_lst, gamma_fuel,
     cool_compos = getattr(const, cool+'_composition')(gamma_cool)
     mod_compos = getattr(const, mod+'_composition')(gamma_mod)
     commands = [command('fier', None),
-                command('macro', '2,1,2,3,1,2,3,2,' + '4,'*num_of_mod_rings)]
+                command('macro', ('2, 1, 2, 3, 1, 2, 3, 2, ' +
+                                  '4, '*num_of_mod_rings))]
     config('6')
     for x in x_lst:
         key = 'Обогащение '+str(x)
@@ -54,7 +55,7 @@ def lab6(d, delta, D, Delta, num_of_fuel_rods, x_lst, gamma_fuel,
             run('getera.exe')
             find_coeff('lab6.out', result_dict[key])
             find_macro('lab6.out', result_dict[key])
-    draw('6', a_array, result_dict, 'Шаг решетки, см')
+    draw('Lab6', a_array, result_dict, 'Шаг решетки, см')
 
 
 def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
@@ -72,9 +73,8 @@ def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
         return (exp_xe + coeff*(exp_i - exp_xe))*rho_array[-1]/max(rho_array)
 
     def list_of_commands(qv, time_step):
-        return [command('fier', None),
-                command('burn', {'qv': str(qv), 'dtim': str(time_step)}),
-                command('corr', None)]
+        return [command('burn', {'qv': str(qv), 'dtim': str(time_step)}),
+                command('corr', None), command('fier', None)]
 
     def mode1(qv, time_step):
         return (list_of_commands(qv * 0.5, time_step) * int(1 / time_step) +
@@ -99,22 +99,24 @@ def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
     # создание структур данных
     key1, key2 = 'Корпусной', 'Канальный'
     k_dict = {key1: {'K': []}, key2: {'K': []}}
-    xe_dict = {key1: {'xe35': []}, key2: {'xe35': []}}
+    xe_dict = {key1: {'xe35': [0]}, key2: {'xe35': [0]}}
     # расчет ячейки копусного реактора
     file_in = open('lab5.txt', 'w')
+    commands = ([command('fier', None)] +
+                locals()['mode'+str(mode)](qv_korp, time_step))
     korp.create_file(file_in, d_korp, delta_korp, r_opt_korp,
-                     fuel_compos_korp, cool_compos_korp,
-                     locals()['mode'+str(mode)](qv_korp, time_step))
+                     fuel_compos_korp, cool_compos_korp, commands)
     config('5')
     run('getera.exe')
     find_coeff('lab5.out', k_dict[key1])
     find_concent('lab5.out', xe_dict[key1])
     # расчет ячейки канального реактора
     file_in = open('lab6.txt', 'w')
+    commands = ([command('fier', None)] +
+                locals()['mode'+str(mode)](qv_kan, time_step))
     kan.create_file(file_in, d_kan, delta_kan, r_opt_kan, D, Delta,
                     num_of_fuel_rods, num_of_mod_rings, fuel_compos_kan,
-                    cool_compos_kan, mod_compos,
-                    locals()['mode'+str(mode)](qv_kan, time_step))
+                    cool_compos_kan, mod_compos, commands)
     config('6')
     run('getera.exe')
     find_coeff('lab6.out', k_dict[key2])
@@ -126,6 +128,7 @@ def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
     for concent in after_stop(time_array, 7*10**12, xe_dict[key2]['xe35']):
         xe_dict[key2]['xe35'].append(concent)
     # прорисовка
-    draw('7', arange(0, 5, time_step), k_dict, 'Время, сут')
-    draw('7', concatenate((arange(0, 5, time_step), arange(5, 7, time_step/10))),
-         xe_dict, 'Время, сут')
+    draw('Lab7', arange(0, 5+time_step, time_step), k_dict, 'Время, сут')
+    draw('Lab7', concatenate((arange(0, 5+time_step, time_step),
+                              arange(5, 7, time_step/10))),
+        xe_dict, 'Время, сут')

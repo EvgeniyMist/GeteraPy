@@ -34,6 +34,16 @@ def config(num):
     config_file.close()
 
 
+def find_burning(name_of_file):
+    out_file = open(name_of_file, 'r')
+    burning_lst = []
+    for line in out_file:
+        if 'burn up' in line:
+            burning_lst.append(float(line.split()[5]))
+    burning_lst.insert(0, 0)
+    return burning_lst
+
+
 def find_coeff(name_of_file, result_dict):
     out_file = open(name_of_file, 'r')
     flag = False
@@ -51,7 +61,7 @@ def find_coeff(name_of_file, result_dict):
             flag = True
 
 
-def find_concent(name_of_file, result_dict):
+def find_concent(name_of_file, result_dict, norm=True):
 
     def calcul_mean(lst):
         if lst == []:
@@ -98,7 +108,38 @@ def find_concent(name_of_file, result_dict):
         elif line[:5] == ':stop':
             # фиксируем окончание перечисления входных данных
             flag_out_data = True
-    normalize(result_dict)
+    if norm:
+        normalize(result_dict)
+
+
+def find_compos(name_of_file, num_of_corr, num_of_cell):
+    out_file = open(name_of_file, 'r')
+    flag_out_data = False
+    flag_cell = False
+    flag_data = False
+    counter = 0
+    compos = {}
+    for line in out_file:
+        if flag_out_data:
+            if line[:5] == ':corr':
+                # подсчитываем число команд corr
+                counter += 1
+            elif (counter == num_of_corr and 'number of cells' in line and
+                  str(num_of_cell) in line):
+                # фиксируем нахождение нужной ячейки в нужной по счету команде
+                flag_cell = True
+            elif flag_cell and 'izotop' in line:
+                # фиксируем начало перечисления изотопного состава
+                flag_data = True
+            elif flag_data:
+                try:
+                    int(line.split()[0])
+                except ValueError:
+                    return compos
+                compos[line.split()[1]] = float(line.split()[2])
+        elif line[:5] == ':stop':
+            # фиксируем окончание перечисления входных данных
+            flag_out_data = True
 
 
 def find_macro(name_of_file, result_dict):
@@ -151,7 +192,7 @@ def find_r_opt_kan(d, delta, D, Delta, num_of_fuel_rods, fuel_compos,
     return R_array[argmax(result_dict['K'])]
 
 
-def draw(num, step_array, result_dict, x_label):
+def draw(folder, step_array, result_dict, x_label):
     for name_of_var in tex_dict:
         if name_of_var not in result_dict[list(result_dict.keys())[0]]:
             continue
@@ -163,6 +204,6 @@ def draw(num, step_array, result_dict, x_label):
         plt.title(tex_dict[name_of_var])
         plt.xlabel(x_label, fontsize=15)
         plt.legend()
-        plt.savefig(getcwd() + '\\ФТЯР\\LAB'+num+'\\' + name_of_var + '.png',
+        plt.savefig(getcwd() + '\\ФТЯР\\'+ folder +'\\' + name_of_var + '.png',
                     format='png', dpi=100)
         plt.clf()
