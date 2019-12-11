@@ -348,7 +348,95 @@ def config_hw3_window():
     
 
 def config_hw4_window():
-    pass
+    hw4_w = Toplevel(bg='lightgrey')
+    hw4_w.title('Домашнее задание №4')
+    hw4_w.resizable(False, False)
+    hw4_w.geometry('1080x440+100+150')
+    
+    frame1 = LabelFrame(hw4_w, text='Параметры и топливный состав реактора ВВЭР', bg='lightgrey')
+    frame1.place(x=10,y=10)    
+    Label(frame1, width=72, height=18, bg='lightgrey').pack()
+    
+    Label(frame1,text='Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}',bg='lightgrey',relief=GROOVE).place(x=135, y=15)
+    Label(frame1, text='Топливо', bg='lightgrey').place(x=40, y=50)
+    Label(frame1, text='Диоксид урана', bg='lightgrey').place(x=200, y=50)
+    gamma_fuel_korp = Entry(frame1, width=15)
+    gamma_fuel_korp.insert(0, '10.4')
+    gamma_fuel_korp.place(x=360, y=50)
+    Label(frame1, text='Теплоноситель', bg='lightgrey').place(x=40, y=80)
+    Label(frame1, text='Вода', bg='lightgrey').place(x=200, y=80)
+    gamma_cool_korp = Entry(frame1, width=15)
+    gamma_cool_korp.insert(0, '0.7')
+    gamma_cool_korp.place(x=360, y=80)
+    Label(frame1, text='Параметры реакторной установки ВВЭР', bg='lightgrey', relief=GROOVE).place(x=130, y=130)
+    Label(frame1, text='Обогащение по U\N{SUPERSCRIPT TWO}\N{SUPERSCRIPT THREE}\N{SUPERSCRIPT FIVE}', bg='lightgrey').place(x=40, y=165)
+    Label(frame1, text='Обогащение по Pu\N{SUPERSCRIPT TWO}\N{SUPERSCRIPT THREE}\N{SUPERSCRIPT NINE}', bg='lightgrey').place(x=40, y=200)
+    x_korp_U = Entry(frame1, width=15)
+    x_korp_U.place(x=360, y=165)
+    x_korp_Pu = Entry(frame1, width=15)
+    x_korp_Pu.place(x=360, y=200)   
+    Label(frame1, text='Значение энергонапряженности, кВт/л', bg='lightgrey').place(x=40, y=235)
+    qv_korp = Entry(frame1, width=15)
+    qv_korp.insert(0, '110')
+    qv_korp.place(x=360, y=235)
+
+    frame2 = LabelFrame(hw4_w, text='Параметры и топливный состав канального реактора', bg='lightgrey')
+    frame2.place(x=535, y=10)    
+    Label(frame2, width=75, height=24, bg='lightgrey').pack()
+
+    Label(frame2, text='Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}',bg='lightgrey', relief=GROOVE).place(x=150, y=10)
+    Label(frame2, text='Теплоноситель', bg='lightgrey').place(x=40, y=55)
+    cool = IntVar()
+    cool.set(0)
+    Radiobutton(frame2, text='H\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=cool, value=1).place(x=200, y=55)
+    Radiobutton(frame2, text='D\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=cool, value=2).place(x=280, y=55)
+    gamma_cool_kan = Entry(frame2, width=15)
+    gamma_cool_kan.place(x=390, y=55)
+    Label(frame2, text='Замедлитель', bg='lightgrey').place(x=40, y=95)   
+    mod = IntVar()
+    mod.set(0)
+    Radiobutton(frame2, text='C', bg='lightgrey', variable=mod, value=1).place(x=200, y=95)
+    Radiobutton(frame2, text='D\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=mod, value=2).place(x=280, y=95)
+    gamma_mod = Entry(frame2, width=15)
+    gamma_mod.place(x=390, y=95)
+    
+    Label(frame2, text='Параметры канального реактора', bg='lightgrey', relief=GROOVE).place(x=145, y=150)
+    Label(frame2, text='Диаметр ТВС, мм', bg='lightgrey').place(x=40, y=185)
+    D = Entry(frame2, width=15)
+    D.insert(0, '100')
+    D.place(x=390, y=185)
+    Label(frame2, text='Толщина оболочки ТВС, мм', bg='lightgrey').place(x=40, y=220)
+    δ_tr = Entry(frame2, width=15)
+    δ_tr.insert(0, '2.5')
+    δ_tr.place(x=390, y=220)
+    Label(frame2, text='Количество ТВЭЛов', bg='lightgrey').place(x=40, y=255)
+    N = Entry(frame2, width=15)
+    N.insert(0, '18')
+    N.place(x=390, y=255)
+    Label(frame2, text='Значение энергонапряженности, кВт/л', bg='lightgrey').place(x=40, y=290)
+    qv_kan = Entry(frame2, width=15)
+    qv_kan.insert(0, '4.5')
+    qv_kan.place(x=390, y=290)
+    Label(frame2, text='Кол-во колец, на которые разбивается замедлитель', bg='lightgrey').place(x=40, y=325)
+    n = Entry(frame2, width=15)
+    n.insert(0, '5')
+    n.place(x=390, y=325)
+    
+    Label(hw4_w, text='Диаметр ТВЭЛа, мм', bg='lightgrey').place(x=50, y=325)
+    d = Entry(hw4_w, width=15)
+    d.insert(0, '11')
+    d.place(x=370, y=325)
+    Label(hw4_w, text='Толщина ТВЭЛа, мм', bg='lightgrey').place(x=50, y=360)
+    δ_t = Entry(hw4_w, width=15)
+    δ_t.insert(0, '0.5')
+    δ_t.place(x=370, y=360)
+    
+    func = lambda: start_hw4(hw4_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
+                              gamma_cool_korp, qv_korp, d_kan, δ_t_kan, D,
+                              δ_tr, N, x_kan, gamma_fuel_kan, cool, mod,
+                              gamma_cool_kan, gamma_mod, n, qv_kan, step, mode)
+    
+    Button(hw4_w, text='Старт', width=15, bg='grey', command=func).place(x=480, y=405)
 
 
 def config_window():
@@ -436,7 +524,7 @@ def start_hw2():
     pass
 
 
-def start_hw3(hw3, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod, gamma_cool,
+def start_hw3(hw3_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod, gamma_cool,
               gamma_mod, n, a_left, a_right, a_delta):
     x_str = x.get()
     x_lst = x_str.split(', ')
