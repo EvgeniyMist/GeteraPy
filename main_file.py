@@ -260,7 +260,110 @@ def config_lab7_window():
 
 
 def config_lab8_window():
-    pass
+    lab8_w = Toplevel(bg='lightgrey')
+    lab8_w.title('Лабораторная работа №8')
+    lab8_w.resizable(False, False)
+    lab8_w.geometry('1080x460+100+150')
+    
+    frame1 = LabelFrame(lab8_w, text='Параметры и топливный состав реактора ВВЭР', bg='lightgrey')
+    frame1.place(x=10,y=10)    
+    Label(frame1, width=72, height=21, bg='lightgrey').pack()
+    
+    Label(frame1,text='Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}',bg='lightgrey',relief=GROOVE).place(x=135, y=15)
+    Label(frame1, text='Топливо', bg='lightgrey').place(x=40, y=50)
+    Label(frame1, text='Диоксид урана', bg='lightgrey').place(x=200, y=50)
+    gamma_fuel_korp = Entry(frame1, width=15)
+    gamma_fuel_korp.insert(0, '10.4')
+    gamma_fuel_korp.place(x=360, y=50)
+    Label(frame1, text='Теплоноситель', bg='lightgrey').place(x=40, y=80)
+    Label(frame1, text='Вода', bg='lightgrey').place(x=200, y=80)
+    gamma_cool_korp = Entry(frame1, width=15)
+    gamma_cool_korp.insert(0, '0.7')
+    gamma_cool_korp.place(x=360, y=80)
+    Label(frame1, text='Параметры реакторной установки ВВЭР', bg='lightgrey', relief=GROOVE).place(x=130, y=130)
+    Label(frame1, text='Обогащение', bg='lightgrey').place(x=40, y=165)
+    Label(frame1, text='Диаметр ТВЭЛа, мм', bg='lightgrey').place(x=40, y=200)
+    Label(frame1, text='Толщина ТВЭЛа, мм', bg='lightgrey').place(x=40, y=235)
+    x_korp = Entry(frame1, width=15)
+    x_korp.insert(0, '0.03')
+    x_korp.place(x=360, y=165)
+    d_korp = Entry(frame1, width=15)
+    d_korp.place(x=360, y=200)
+    δ_t_korp = Entry(frame1, width=15)
+    δ_t_korp.place(x=360, y=235)    
+    Label(frame1, text='Значение энергонапряженности, кВт/л', bg='lightgrey').place(x=40, y=270)
+    qv_korp = Entry(frame1, width=15)
+    qv_korp.insert(0, '110')
+    qv_korp.place(x=360, y=270)
+
+    frame2 = LabelFrame(lab8_w, text='Параметры и топливный состав канального реактора', bg='lightgrey')
+    frame2.place(x=535, y=10)    
+    Label(frame2, width=75, height=28, bg='lightgrey').pack()
+
+    Label(frame2, text='Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}',bg='lightgrey', relief=GROOVE).place(x=150, y=10)
+    Label(frame2, text='Топливо', bg='lightgrey').place(x=40, y=50)
+    Label(frame2, text='Диоксид урана', bg='lightgrey').place(x=220, y=50)
+    gamma_fuel_kan = Entry(frame2, width=15)
+    gamma_fuel_kan.insert(0, '10.4')
+    gamma_fuel_kan.place(x=390, y=50)
+    Label(frame2, text='Теплоноситель', bg='lightgrey').place(x=40, y=80)
+    cool = IntVar()
+    cool.set(0)
+    Radiobutton(frame2, text='H\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=cool, value=1).place(x=200, y=80)
+    Radiobutton(frame2, text='D\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=cool, value=2).place(x=280, y=80)
+    gamma_cool_kan = Entry(frame2, width=15)
+    gamma_cool_kan.place(x=390, y=80)
+    Label(frame2, text='Замедлитель', bg='lightgrey').place(x=40, y=110)   
+    mod = IntVar()
+    mod.set(0)
+    Radiobutton(frame2, text='C', bg='lightgrey', variable=mod, value=1).place(x=200, y=110)
+    Radiobutton(frame2, text='D\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=mod, value=2).place(x=280, y=110)
+    gamma_mod = Entry(frame2, width=15)
+    gamma_mod.place(x=390, y=110)
+    
+    Label(frame2, text='Параметры канального реактора', bg='lightgrey', relief=GROOVE).place(x=145, y=150)
+    Label(frame2, text='Обогащение', bg='lightgrey').place(x=40, y=180)
+    x_kan = Entry(frame2, width=15)
+    x_kan.insert(0, '0.03')
+    x_kan.place(x=390, y=180)
+    Label(frame2, text='Диаметр ТВС, мм', bg='lightgrey').place(x=40, y=210)
+    D = Entry(frame2, width=15)
+    D.insert(0, '100')
+    D.place(x=390, y=210)
+    Label(frame2, text='Толщина оболочки ТВС, мм', bg='lightgrey').place(x=40, y=240)
+    δ_tr = Entry(frame2, width=15)
+    δ_tr.insert(0, '2.5')
+    δ_tr.place(x=390, y=240)
+    Label(frame2, text='Количество ТВЭЛов', bg='lightgrey').place(x=40, y=270)
+    N = Entry(frame2, width=15)
+    N.insert(0, '18')
+    N.place(x=390, y=270)
+    Label(frame2, text='Диаметр ТВЭЛа, мм', bg='lightgrey').place(x=40, y=300)
+    d_kan = Entry(frame2, width=15)
+    d_kan.place(x=390, y=300)
+    Label(frame2, text='Толщина оболочки ТВЭЛа, мм', bg='lightgrey').place(x=40, y=330)
+    δ_t_kan = Entry(frame2, width=15)
+    δ_t_kan.place(x=390, y=330)
+    Label(frame2, text='Значение энергонапряженности, кВт/л', bg='lightgrey').place(x=40, y=360)
+    qv_kan = Entry(frame2, width=15)
+    qv_kan.insert(0, '4.5')
+    qv_kan.place(x=390, y=360)
+    Label(frame2, text='Кол-во колец, на которые разбивается замедлитель', bg='lightgrey').place(x=40, y=390)
+    n = Entry(frame2, width=15)
+    n.insert(0, '5')
+    n.place(x=390, y=390)
+
+    Label(lab8_w, text='Шаг циклов расчета выгорания, сут', bg='lightgrey').place(x=50, y=370)
+    step = Entry(lab8_w, width=15)
+    step.insert(0, '0.25')
+    step.place(x=370, y=370)
+
+    func = lambda: start_lab8(lab8_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
+                              gamma_cool_korp, qv_korp, d_kan, δ_t_kan, D,
+                              δ_tr, N, x_kan, gamma_fuel_kan, cool, mod,
+                              gamma_cool_kan, gamma_mod, n, qv_kan, step)
+
+    Button(lab8_w, text='Старт', width=15, bg='grey', command=func).place(x=230, y=415)
 
 
 def config_hw1_window():
@@ -513,8 +616,24 @@ def start_lab7(lab7_w, d_korp, delta_korp, x_korp, gamma_fuel_korp,
                 parent=lab7_w)
 
 
-def start_lab8():
-    pass
+def start_lab8(lab8_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
+               gamma_cool_korp, qv_korp, d_kan, δ_t_kan, D, δ_tr,
+               num_of_fuel_rods, x_kan, gamma_fuel_kan, cool, mod,
+               gamma_cool_kan, gamma_mod, num_of_mod_rings, qv_kan, step):
+    cool = 'h2o' if cool.get() == 1 else 'd2o'
+    mod = 'c' if mod.get() == 1 else 'd2o'
+    labs.lab8(float(d_korp.get())/10, float(δ_t_korp.get())/10,
+              float(x_korp.get()), float(gamma_fuel_korp.get()),    
+              float(gamma_cool_korp.get()), float(qv_korp.get()),
+              float(d_kan.get())/10, float(δ_t_kan.get())/10,
+              float(D.get())/10, float(δ_tr.get())/10,
+              int(num_of_fuel_rods.get()), float(x_kan.get()),
+              float(gamma_fuel_kan.get()), cool, mod,
+              float(gamma_cool_kan.get()), float(gamma_mod.get()),
+              int(num_of_mod_rings.get()), float(qv_kan.get()),
+              float(step.get()))
+    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB8',
+                parent=lab8_w)
 
 
 def start_hw1():
