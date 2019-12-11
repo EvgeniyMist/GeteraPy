@@ -34,6 +34,16 @@ def config(num):
     config_file.close()
 
 
+def clear_data(burning_lst, end_burning, result_dict):
+    for i in range(len(burning_lst)):
+        if burning_lst[i] > end_burning:
+            while len(burning_lst) != i:
+                burning_lst.pop(i)
+            for var in result_dict:
+                result_dict[var] = result_dict[var][:i]
+            return
+
+
 def find_burning(name_of_file):
     out_file = open(name_of_file, 'r')
     burning_lst = []

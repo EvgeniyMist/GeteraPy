@@ -2,6 +2,7 @@ from tkinter import*
 from tkinter import messagebox as mb 
 
 import labs
+import homeworks as hw
 
 
 def config_lab1_widow():
@@ -371,10 +372,10 @@ def config_hw4_window():
     Label(frame1, text='Параметры реакторной установки ВВЭР', bg='lightgrey', relief=GROOVE).place(x=130, y=130)
     Label(frame1, text='Обогащение по U\N{SUPERSCRIPT TWO}\N{SUPERSCRIPT THREE}\N{SUPERSCRIPT FIVE}', bg='lightgrey').place(x=40, y=165)
     Label(frame1, text='Обогащение по Pu\N{SUPERSCRIPT TWO}\N{SUPERSCRIPT THREE}\N{SUPERSCRIPT NINE}', bg='lightgrey').place(x=40, y=200)
-    x_korp_U = Entry(frame1, width=15)
-    x_korp_U.place(x=360, y=165)
-    x_korp_Pu = Entry(frame1, width=15)
-    x_korp_Pu.place(x=360, y=200)   
+    x_korp_u = Entry(frame1, width=15)
+    x_korp_u.place(x=360, y=165)
+    x_korp_pu = Entry(frame1, width=15)
+    x_korp_pu.place(x=360, y=200)   
     Label(frame1, text='Значение энергонапряженности, кВт/л', bg='lightgrey').place(x=40, y=235)
     qv_korp = Entry(frame1, width=15)
     qv_korp.insert(0, '110')
@@ -431,10 +432,10 @@ def config_hw4_window():
     δ_t.insert(0, '0.5')
     δ_t.place(x=370, y=360)
     
-    func = lambda: start_hw4(hw4_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
-                              gamma_cool_korp, qv_korp, d_kan, δ_t_kan, D,
-                              δ_tr, N, x_kan, gamma_fuel_kan, cool, mod,
-                              gamma_cool_kan, gamma_mod, n, qv_kan, step, mode)
+    func = lambda: start_hw4(hw4_w, d, δ_t, x_korp_u, x_korp_pu,
+                             gamma_fuel_korp, gamma_cool_korp, qv_korp, D,
+                             δ_tr, N, cool, mod, gamma_cool_kan, gamma_mod, n,
+                             qv_kan)
     
     Button(hw4_w, text='Старт', width=15, bg='grey', command=func).place(x=480, y=405)
 
@@ -540,8 +541,20 @@ def start_hw3(hw3_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod, gamma_cool,
                 parent=hw3_w)
 
 
-def start_hw4():
-    pass
+def start_hw4(hw4_w, d, delta, x_u, x_pu, gamma_fuel, gamma_cool_korp,
+              qv_korp, D, Delta, num_of_fuel_rods, cool, mod, gamma_cool_kan,
+              gamma_mod, num_of_mod_rings, qv_kan):
+    cool = 'h2o' if cool.get() == 1 else 'd2o'
+    mod = 'c' if mod.get() == 1 else 'd2o'
+    hw.hw4(float(d.get())/10, float(delta.get())/10, float(x_u.get()),
+           float(x_pu.get()), float(gamma_fuel.get()),    
+           float(gamma_cool_korp.get()), float(qv_korp.get()),
+           float(D.get())/10, float(Delta.get())/10,
+           int(num_of_fuel_rods.get()), cool, mod,
+           float(gamma_cool_kan.get()), float(gamma_mod.get()),
+           int(num_of_mod_rings.get()), float(qv_kan.get()))
+    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\HW4',
+                parent=hw4_w)
 
 
 # создание главного окна и задание его параметров

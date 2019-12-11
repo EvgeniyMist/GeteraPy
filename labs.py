@@ -5,7 +5,7 @@ import constants as const
 import korp
 import kan
 from functions import*
-from commands import command
+from commands import command, camp
 
 
 def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, R_left, R_right, R_delta):
@@ -72,17 +72,13 @@ def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
         time_array /= 3600*24
         return (exp_xe + coeff*(exp_i - exp_xe))*rho_array[-1]/max(rho_array)
 
-    def list_of_commands(qv, time_step):
-        return [command('burn', {'qv': str(qv), 'dtim': str(time_step)}),
-                command('corr', None), command('fier', None)]
-
     def mode1(qv, time_step):
-        return (list_of_commands(qv * 0.5, time_step) * int(1 / time_step) +
-                list_of_commands(qv, time_step) * int(4 / time_step))
+        return (camp(qv * 0.5, time_step, int(1 / time_step)) +
+                camp(qv, time_step, int(4 / time_step), False))
 
     def mode2(qv, time_step):
-        return (list_of_commands(qv, time_step) * int(4 / time_step) +
-                list_of_commands(qv * 0.5, time_step) * int(1 / time_step))
+        return (camp(qv, time_step, int(4 / time_step)) +
+                camp(qv * 0.5, time_step, int(1 / time_step), False))
 
     # создание материальных композиций
     fuel_compos_korp = const.uo2_composition(x_korp, gamma=gamma_fuel_korp)
@@ -102,8 +98,7 @@ def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
     xe_dict = {key1: {'xe35': [0]}, key2: {'xe35': [0]}}
     # расчет ячейки копусного реактора
     file_in = open('lab5.txt', 'w')
-    commands = ([command('fier', None)] +
-                locals()['mode'+str(mode)](qv_korp, time_step))
+    commands = locals()['mode'+str(mode)](qv_korp, time_step)
     korp.create_file(file_in, d_korp, delta_korp, r_opt_korp,
                      fuel_compos_korp, cool_compos_korp, commands)
     config('5')
@@ -112,8 +107,7 @@ def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
     find_concent('lab5.out', xe_dict[key1])
     # расчет ячейки канального реактора
     file_in = open('lab6.txt', 'w')
-    commands = ([command('fier', None)] +
-                locals()['mode'+str(mode)](qv_kan, time_step))
+    commands = locals()['mode'+str(mode)](qv_kan, time_step)
     kan.create_file(file_in, d_kan, delta_kan, r_opt_kan, D, Delta,
                     num_of_fuel_rods, num_of_mod_rings, fuel_compos_kan,
                     cool_compos_kan, mod_compos, commands)
