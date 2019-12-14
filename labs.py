@@ -36,11 +36,14 @@ def lab6(d, delta, D, Delta, num_of_fuel_rods, x_lst, gamma_fuel,
     a_array = arange(a_left, a_right, a_delta)
     R_array = a_array / pi**0.5
     result_dict = {}
+    if num_of_fuel_rods == 18:
+        k = 2
+    elif num_of_fuel_rods == 36:
+        k = 3
+    nbv = ('2, ' + '1, 2, 3, ' * k + '2, ' + '4, ' * num_of_mod_rings)
     cool_compos = getattr(const, cool+'_composition')(gamma_cool)
     mod_compos = getattr(const, mod+'_composition')(gamma_mod)
-    commands = [command('fier', None),
-                command('macro', ('2, 1, 2, 3, 1, 2, 3, 2, ' +
-                                  '4, '*num_of_mod_rings))]
+    commands = [command('fier', None), command('macro', nbv)]
     config('6')
     for x in x_lst:
         key = 'Обогащение '+str(x)
