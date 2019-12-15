@@ -1,6 +1,5 @@
 from numpy import pi, linspace
 
-
 from constants import N_zr
 from commands import write_commands
 
