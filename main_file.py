@@ -353,15 +353,10 @@ def config_lab8_window():
     n.insert(0, '5')
     n.place(x=390, y=390)
 
-    Label(lab8_w, text='Шаг циклов расчета выгорания, сут', bg='lightgrey').place(x=50, y=370)
-    step = Entry(lab8_w, width=15)
-    step.insert(0, '0.25')
-    step.place(x=370, y=370)
-
     func = lambda: start_lab8(lab8_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
                               gamma_cool_korp, qv_korp, d_kan, δ_t_kan, D,
                               δ_tr, N, x_kan, gamma_fuel_kan, cool, mod,
-                              gamma_cool_kan, gamma_mod, n, qv_kan, step)
+                              gamma_cool_kan, gamma_mod, n, qv_kan)
 
     Button(lab8_w, text='Старт', width=15, bg='grey', command=func).place(x=230, y=415)
 
@@ -619,7 +614,7 @@ def start_lab7(lab7_w, d_korp, delta_korp, x_korp, gamma_fuel_korp,
 def start_lab8(lab8_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
                gamma_cool_korp, qv_korp, d_kan, δ_t_kan, D, δ_tr,
                num_of_fuel_rods, x_kan, gamma_fuel_kan, cool, mod,
-               gamma_cool_kan, gamma_mod, num_of_mod_rings, qv_kan, step):
+               gamma_cool_kan, gamma_mod, num_of_mod_rings, qv_kan):
     cool = 'h2o' if cool.get() == 1 else 'd2o'
     mod = 'c' if mod.get() == 1 else 'd2o'
     labs.lab8(float(d_korp.get())/10, float(δ_t_korp.get())/10,
@@ -630,8 +625,7 @@ def start_lab8(lab8_w, d_korp, δ_t_korp, x_korp, gamma_fuel_korp,
               int(num_of_fuel_rods.get()), float(x_kan.get()),
               float(gamma_fuel_kan.get()), cool, mod,
               float(gamma_cool_kan.get()), float(gamma_mod.get()),
-              int(num_of_mod_rings.get()), float(qv_kan.get()),
-              float(step.get()))
+              int(num_of_mod_rings.get()), float(qv_kan.get()))
     mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB8',
                 parent=lab8_w)
 
