@@ -4,7 +4,6 @@ from subprocess import run
 from numpy import argmax, arange, pi, linspace, mean, interp
 from scipy.optimize import brentq
 
-import korp
 import kan
 from commands import command
 
@@ -67,30 +66,6 @@ def camp_kan(d, delta, D, Delta, num_of_fuel_rods, fuel_compos, cool_compos,
         end_burning = brentq(result_func, 0, max(burning_lst))
     except ValueError:
         end_burning = 0
-    clear_data(burning_lst, end_burning, result_dict)
-    return burning_lst
-
-
-def camp_korp(d, delta, fuel_compos, cool_compos, commands, result_dict):
-    ''' Рассчитывает кампанию корпусного реактора
-
-        Аргументы:
-        стандартные параметры корпусного реактора
-        commands - список команд, задающих кампанию реактора
-        result_dict - стандартный словарь с данными '''
-
-    r_opt = find_r_opt_korp(d, delta, fuel_compos, cool_compos)
-    file_in = open('lab5.txt', 'w')
-    korp.create_file(file_in, d, delta, r_opt, fuel_compos, cool_compos,
-                     commands)
-    config('5')
-    run('getera.exe')
-    find_coeff('lab5.out', result_dict)
-    find_concent('lab5.out', result_dict, norm=False)
-    burning_lst = find_burning('lab5.out')
-    k_func = lambda b: interp(b, burning_lst, result_dict['K'])
-    result_func = lambda b: k_func(b) + k_func(2*b) + k_func(3*b) - 3
-    end_burning = 3*brentq(result_func, 0, max(burning_lst))
     clear_data(burning_lst, end_burning, result_dict)
     return burning_lst
 
@@ -332,26 +307,6 @@ def find_r_opt_kan(d, delta, D, Delta, num_of_fuel_rods, fuel_compos,
                         mod_compos, [command('fier', None)])
         run('getera.exe')
         find_coeff('lab6.out', result_dict)
-    return R_array[argmax(result_dict['K'])]
-
-
-def find_r_opt_korp(d, delta, fuel_compos, cool_compos, R_left=0.5,
-                    R_right=1.5, R_delta=0.025):
-    ''' Возвращает оптимальный эквивалентный радиус ячейки корпусного реактора
-
-        Аргументы:
-        стандартные параметры корпусного реактора
-        диапазон и шаг прогонки шага решетки '''
-
-    R_array = arange(R_left, R_right, R_delta)
-    result_dict = {'K': []}
-    config('5')
-    for R in R_array:
-        file_in = open('lab5.txt', 'w')
-        korp.create_file(file_in, d, delta, R, fuel_compos,
-                         cool_compos, [command('fier', None)])
-        run('getera.exe')
-        find_coeff('lab5.out', result_dict)
     return R_array[argmax(result_dict['K'])]
 
 

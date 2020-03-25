@@ -1,8 +1,11 @@
-from tkinter import*
-from tkinter import messagebox as mb 
+import tkinter as tk
+from tkinter import messagebox as mb
 
 import labs
 import homeworks as hw
+
+
+bg_color = 'lightgrey'
 
 
 def config_lab1_widow():
@@ -22,132 +25,182 @@ def config_lab4_window():
 
 
 def config_lab5_window():
-    lab5_w = Toplevel(bg='lightgrey')
+
+    def start_lab5(lab5_w, d, delta, x, gamma_fuel, gamma_cool, r_left,
+                   r_right, r_delta):
+        x_lst = list(map(float, x.get().split(', ')))
+        labs.lab5(float(d.get())/10, float(delta.get())/10, x_lst,
+                  float(gamma_fuel.get()), float(gamma_cool.get()),
+                  float(r_left.get())/10, float(r_right.get())/10,
+                  float(r_delta.get())/10)
+        mb.showinfo('Информация',
+                    'Данные сохранены в директории ~bin\\ФТЯР\\Lab5',
+                    parent=lab5_w)
+
+    lab5_w = tk.Toplevel(bg=bg_color)
     lab5_w.title('Лабораторная работа №5')
     lab5_w.resizable(False, False)
     lab5_w.geometry('530x340+700+150')
 
-    frame1 = LabelFrame(lab5_w, text='Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}', bg='lightgrey')
-    frame1.place(x=10,y=10)    
-    Label(frame1, width=71, height=5, bg='lightgrey').pack()
-    Label(frame1, text='Топливо', bg='lightgrey').place(x=40, y=10)
-    Label(frame1, text='Диоксид урана', bg='lightgrey').place(x=200, y=10)
-    gamma_fuel = Entry(frame1, width=15)
+    frame_title = 'Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}'
+    gamma_frame = tk.LabelFrame(lab5_w, text=frame_title, bg=bg_color)
+    gamma_frame.place(x=10, y=10)
+    tk.Label(gamma_frame, width=71, height=5, bg=bg_color).pack()
+    tk.Label(gamma_frame, text='Топливо', bg=bg_color).place(x=40, y=10)
+    tk.Label(gamma_frame, text='Диоксид урана', bg=bg_color).place(x=200, y=10)
+    gamma_fuel = tk.Entry(gamma_frame, width=15)
     gamma_fuel.insert(0, '10.4')
     gamma_fuel.place(x=360, y=10)
-    Label(frame1, text='Теплоноситель', bg='lightgrey').place(x=40, y=40)
-    Label(frame1, text='Вода', bg='lightgrey').place(x=200, y=40)
-    gamma_cool = Entry(frame1, width=15)
+    tk.Label(gamma_frame, text='Теплоноситель', bg=bg_color).place(x=40, y=40)
+    tk.Label(gamma_frame, text='Вода', bg=bg_color).place(x=200, y=40)
+    gamma_cool = tk.Entry(gamma_frame, width=15)
     gamma_cool.insert(0, '0.7')
     gamma_cool.place(x=360, y=40)
 
-    frame2 = LabelFrame(lab5_w, text='Параметры реактора ВВЭР', bg='lightgrey')
-    frame2.place(x=10, y=120)
-    Label(frame2, width=71, height=10, bg='lightgrey').pack()
-    Label(frame2, text='Обогащения (через запятую, от 0 до 1)', bg='lightgrey').place(x=40, y=10)
-    x = Entry(frame2, width=30)
+    frame_title = 'Параметры реактора ВВЭР'
+    main_frame = tk.LabelFrame(lab5_w, text=frame_title, bg=bg_color)
+    main_frame.place(x=10, y=120)
+    tk.Label(main_frame, width=71, height=10, bg=bg_color).pack()
+    tk.Label(main_frame, text='Обогащения (через запятую, от 0 до 1)',
+             bg=bg_color).place(x=40, y=10)
+    x = tk.Entry(main_frame, width=30)
     x.place(x=300, y=10)
-    Label(frame2, text='Диаметр ТВЭЛа, мм', bg='lightgrey').place(x=40, y=40)
-    d = Entry(frame2, width=15)
+    tk.Label(main_frame, text='Диаметр ТВЭЛа, мм',
+             bg=bg_color).place(x=40, y=40)
+    d = tk.Entry(main_frame, width=15)
     d.place(x=300, y=40)
-    Label(frame2, text='Толщина ТВЭЛа, мм', bg='lightgrey').place(x=40, y=70) 
-    delta = Entry(frame2, width=15)
+    tk.Label(main_frame, text='Толщина ТВЭЛа, мм',
+             bg=bg_color).place(x=40, y=70)
+    delta = tk.Entry(main_frame, width=15)
     delta.place(x=300, y=70)
-    Label(frame2, text='Диапазон значений шага решетки (мм) от', bg='lightgrey').place(x=10, y=115)
-    R_left = Entry(frame2, width=5)
-    R_left.place(x=270, y=115)
-    R_left.insert(0, '5')
-    Label(frame2, text='до',bg='lightgrey').place(x=310, y=115)
-    R_right = Entry(frame2, width=5)
-    R_right.insert(0, '15')
-    R_right.place(x=340, y=115)
-    Label(frame2, text='с шагом', bg='lightgrey').place(x=380, y=115)
-    R_delta = Entry(frame2, width=5)
-    R_delta.insert(0, '0.5')
-    R_delta.place(x=440, y=115)
+    tk.Label(main_frame, text='Диапазон значений шага решетки (мм) от',
+             bg=bg_color).place(x=10, y=115)
+    r_left = tk.Entry(main_frame, width=5)
+    r_left.place(x=270, y=115)
+    r_left.insert(0, '5')
+    tk.Label(main_frame, text='до', bg=bg_color).place(x=310, y=115)
+    r_right = tk.Entry(main_frame, width=5)
+    r_right.insert(0, '15')
+    r_right.place(x=340, y=115)
+    tk.Label(main_frame, text='с шагом', bg=bg_color).place(x=380, y=115)
+    r_delta = tk.Entry(main_frame, width=5)
+    r_delta.insert(0, '0.5')
+    r_delta.place(x=440, y=115)
 
     func = lambda: start_lab5(lab5_w, d, delta, x, gamma_fuel, gamma_cool,
-                              R_left, R_right, R_delta)
-    Button(lab5_w, width=15, text='Старт', bg='grey', command=func).place(x=220, y=300)  
+                              r_left, r_right, r_delta)
+    tk.Button(lab5_w, width=15, text='Старт', bg='grey',
+              command=func).place(x=220, y=300)
 
 
 def config_lab6_window():
-    lab6_w = Toplevel(bg='lightgrey')
+
+    def start_lab6(lab6_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod,
+                   gamma_cool, gamma_mod, n, a_left, a_right, a_delta):
+        x_lst = list(map(float, x.get().split(', ')))
+        cool = 'h2o' if cool.get() == 1 else 'd2o'
+        mod = 'c' if mod.get() == 1 else 'd2o'
+        labs.lab6(float(d.get())/10, float(delta.get())/10,
+                  float(d_assembly.get())/10, float(delta_assembly.get())/10,
+                  int(fuel_rods_num.get()), x_lst, float(gamma_fuel.get()),
+                  cool, mod, float(gamma_cool.get()), float(gamma_mod.get()),
+                  int(mod_rings_num.get()), float(a_left.get())/10,
+                  float(a_right.get())/10, float(a_delta.get())/10)
+        mb.showinfo('Информация',
+                    'Данные сохранены в директории ~bin\\ФТЯР\\LAB6',
+                    parent=lab6_w)
+
+    lab6_w = tk.Toplevel(bg=bg_color)
     lab6_w.title('Лабораторная работа №6')
     lab6_w.resizable(False, False)
     lab6_w.geometry('530x485+700+150')
 
-    frame1 = LabelFrame(lab6_w, text='Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}', bg='lightgrey')
-    frame1.place(x=10,y=10)    
-    Label(frame1, width=71, height=7, bg='lightgrey').pack()  
-    Label(frame1, text='Топливо', bg='lightgrey').place(x=40, y=10)
-    Label(frame1, text='Диоксид урана', bg='lightgrey').place(x=170, y=10)
-    gamma_fuel = Entry(frame1, width=15)
+    frame_title = 'Значения плотностей веществ, г/см\N{SUPERSCRIPT THREE}'
+    gamma_frame = tk.LabelFrame(lab6_w, text=frame_title, bg=bg_color)
+    gamma_frame.place(x=10, y=10)
+    tk.Label(gamma_frame, width=71, height=7, bg=bg_color).pack()
+    tk.Label(gamma_frame, text='Топливо', bg=bg_color).place(x=40, y=10)
+    tk.Label(gamma_frame, text='Диоксид урана', bg=bg_color).place(x=170, y=10)
+    gamma_fuel = tk.Entry(gamma_frame, width=15)
     gamma_fuel.insert(0, '10.4')
     gamma_fuel.place(x=360, y=10)
-    Label(frame1, text='Теплоноситель', bg='lightgrey').place(x=40, y=40)
-    cool = IntVar()
+    tk.Label(gamma_frame, text='Теплоноситель', bg=bg_color).place(x=40, y=40)
+    cool = tk.IntVar()
     cool.set(0)
-    Radiobutton(frame1, text='H\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=cool, value=1).place(x=170, y=40)
-    Radiobutton(frame1, text='D\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=cool, value=2).place(x=250, y=40)
-    gamma_cool = Entry(frame1, width=15)
+    tk.Radiobutton(gamma_frame, text='H\N{SUBSCRIPT TWO}O', bg=bg_color,
+                   variable=cool, value=1).place(x=170, y=40)
+    tk.Radiobutton(gamma_frame, text='D\N{SUBSCRIPT TWO}O', bg=bg_color,
+                   variable=cool, value=2).place(x=250, y=40)
+    gamma_cool = tk.Entry(gamma_frame, width=15)
     gamma_cool.place(x=360, y=40)
-    Label(frame1, text='Замедлитель', bg='lightgrey').place(x=40, y=70)   
-    mod = IntVar()
+    tk.Label(gamma_frame, text='Замедлитель', bg=bg_color).place(x=40, y=70)
+    mod = tk.IntVar()
     mod.set(0)
-    Radiobutton(frame1, text='C', bg='lightgrey', variable=mod, value=1).place(x=170, y=70)
-    Radiobutton(frame1, text='D\N{SUBSCRIPT TWO}O', bg='lightgrey', variable=mod, value=2).place(x=250, y=70)
-    gamma_mod = Entry(frame1, width=15)
+    tk.Radiobutton(gamma_frame, text='C', bg=bg_color, variable=mod,
+                   value=1).place(x=170, y=70)
+    tk.Radiobutton(gamma_frame, text='D\N{SUBSCRIPT TWO}O', bg=bg_color,
+                   variable=mod, value=2).place(x=250, y=70)
+    gamma_mod = tk.Entry(gamma_frame, width=15)
     gamma_mod.place(x=360, y=70)
 
-    frame2 = LabelFrame(lab6_w, text='Параметры канального реактора', bg='lightgrey')
-    frame2.place(x=10, y=155)    
-    Label(frame2, width=71, height=17, bg='lightgrey').pack()
-    Label(frame2, text='Обогащения (через запятую, от 0 до 1)', bg='lightgrey').place(x=10, y=10)
-    x = Entry(frame2, width=15)
+    frame_title = 'Параметры канального реактора'
+    main_frame = tk.LabelFrame(lab6_w, text=frame_title, bg=bg_color)
+    main_frame.place(x=10, y=155)
+    tk.Label(main_frame, width=71, height=17, bg=bg_color).pack()
+    tk.Label(main_frame, text='Обогащения (через запятую, от 0 до 1)',
+             bg=bg_color).place(x=10, y=10)
+    x = tk.Entry(main_frame, width=15)
     x.place(x=360, y=10)
-    Label(frame2, text='Диаметр ТВС, мм', bg='lightgrey').place(x=10, y=40)
-    D = Entry(frame2, width=15)
-    D.insert(0, '100')
-    D.place(x=360, y=40)
-    Label(frame2, text='Толщина оболочки ТВС, мм', bg='lightgrey').place(x=10, y=70)
-    δ_tr = Entry(frame2, width=15)
-    δ_tr.insert(0, '2.5')
-    δ_tr.place(x=360, y=70)
-    Label(frame2, text='Количество ТВЭЛов', bg='lightgrey').place(x=10, y=100)
-    N = Entry(frame2, width=15)
-    N.insert(0, '18')
-    N.place(x=360, y=100)
-    Label(frame2, text='Диаметр ТВЭЛа, мм', bg='lightgrey').place(x=10, y=130)
-    d = Entry(frame2, width=15)
+    tk.Label(main_frame, text='Диаметр ТВС, мм', bg=bg_color).place(x=10, y=40)
+    d_assembly = tk.Entry(main_frame, width=15)
+    d_assembly.insert(0, '100')
+    d_assembly.place(x=360, y=40)
+    tk.Label(main_frame, text='Толщина оболочки ТВС, мм',
+             bg=bg_color).place(x=10, y=70)
+    delta_assembly = tk.Entry(main_frame, width=15)
+    delta_assembly.insert(0, '2.5')
+    delta_assembly.place(x=360, y=70)
+    tk.Label(main_frame, text='Количество ТВЭЛов',
+             bg=bg_color).place(x=10, y=100)
+    fuel_rods_num = tk.Entry(main_frame, width=15)
+    fuel_rods_num.insert(0, '18')
+    fuel_rods_num.place(x=360, y=100)
+    tk.Label(main_frame, text='Диаметр ТВЭЛа, мм',
+             bg=bg_color).place(x=10, y=130)
+    d = tk.Entry(main_frame, width=15)
     d.place(x=360, y=130)
-    Label(frame2, text='Толщина оболочки ТВЭЛа, мм', bg='lightgrey').place(x=10, y=160)
-    δ_t = Entry(frame2, width=15)
-    δ_t.place(x=360, y=160)
-    Label(frame2, text='Диапазон значений шага решетки (мм) от', bg='lightgrey').place(x=10, y=190)
-    a_left = Entry(frame2, width=5)
+    tk.Label(main_frame, text='Толщина оболочки ТВЭЛа, мм',
+             bg=bg_color).place(x=10, y=160)
+    delta = tk.Entry(main_frame, width=15)
+    delta.place(x=360, y=160)
+    tk.Label(main_frame, text='Диапазон значений шага решетки (мм) от',
+             bg=bg_color).place(x=10, y=190)
+    a_left = tk.Entry(main_frame, width=5)
     a_left.place(x=270, y=190)
     a_left.insert(0, '120')
-    Label(frame2, text='до',bg='lightgrey').place(x=310, y=190)
-    a_right = Entry(frame2, width=5)
+    tk.Label(main_frame, text='до', bg=bg_color).place(x=310, y=190)
+    a_right = tk.Entry(main_frame, width=5)
     a_right.insert(0, '400')
     a_right.place(x=335, y=190)
-    Label(frame2, text='с шагом', bg='lightgrey').place(x=380, y=190)
-    a_delta = Entry(frame2, width=5)
+    tk.Label(main_frame, text='с шагом', bg=bg_color).place(x=380, y=190)
+    a_delta = tk.Entry(main_frame, width=5)
     a_delta.insert(0, '20')
     a_delta.place(x=450, y=190)
-    Label(frame2, text='Кол-во колец, на которые разбивается замедлитель', bg='lightgrey').place(x=10, y=220)
-    n = Entry(frame2, width=15)
-    n.insert(0, '5')
-    n.place(x=360, y=220) 
+    tk.Label(main_frame, text='Кол-во колец замедлителя',
+             bg=bg_color).place(x=10, y=220)
+    mod_rings_num = tk.Entry(main_frame, width=15)
+    mod_rings_num.insert(0, '5')
+    mod_rings_num.place(x=360, y=220)
 
-    func = lambda: start_lab6(lab6_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool,
-                              mod, gamma_cool, gamma_mod, n, a_left, a_right,
-                              a_delta)
+    func = lambda: start_lab6(lab6_w, d, delta, d_assembly, delta_assembly,
+                              fuel_rods_num, x, gamma_fuel, cool, mod,
+                              gamma_cool, gamma_mod, mod_rings_num, a_left,
+                              a_right, a_delta)
 
-    Button(lab6_w, width=15, text='Старт', bg='grey', command=func).place(x=220, y=445)
+    tk.Button(lab6_w, width=15, text='Старт', bg='grey',
+              command=func).place(x=220, y=445)
 
-
+'''
 def config_lab7_window():
     lab7_w = Toplevel(bg='lightgrey')
     lab7_w.title('Лабораторная работа №7')
@@ -536,16 +589,16 @@ def config_hw4_window():
                              qv_kan)
     
     Button(hw4_w, text='Старт', width=15, bg='grey', command=func).place(x=480, y=405)
+'''
 
-
-def config_window():
+def config_window(var):
     window_num = var.get()
     if window_num <= 8:
         globals()['config_lab' + str(window_num) + '_window']()
     else:
         globals()['config_hw' + str(window_num - 8) + '_window']()
 
-
+'''
 def start_lab1():
     pass
 
@@ -560,35 +613,6 @@ def start_lab3():
 
 def start_lab4():
     pass
-
-
-def start_lab5(lab5_w, d, δ_t, x, gamma_fuel, gamma_cool, R_left, R_right,
-               R_delta):
-    x_str = x.get()
-    x_lst = x_str.split(', ')
-    x_lst = list(map(float, x_lst))
-    labs.lab5(float(d.get())/10, float(δ_t.get())/10, x_lst,
-              float(gamma_fuel.get()), float(gamma_cool.get()),
-              float(R_left.get())/10, float(R_right.get())/10,
-              float(R_delta.get())/10)
-    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB5',
-                parent=lab5_w)
-
-
-def start_lab6(lab6_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod,
-               gamma_cool, gamma_mod, n, a_left, a_right, a_delta):
-    x_str = x.get()
-    x_lst = x_str.split(', ')
-    x_lst = list(map(float, x_lst))
-    cool = 'h2o' if cool.get() == 1 else 'd2o'
-    mod = 'c' if mod.get() == 1 else 'd2o'
-    labs.lab6(float(d.get())/10, float(δ_t.get())/10, float(D.get())/10,
-              float(δ_tr.get())/10, int(N.get()), x_lst,
-              float(gamma_fuel.get()), cool, mod, float(gamma_cool.get()),
-              float(gamma_mod.get()), int(n.get()), float(a_left.get())/10,
-              float(a_right.get())/10, float(a_delta.get())/10)
-    mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\LAB6',
-                parent=lab6_w)
     
 
 def start_lab7(lab7_w, d_korp, delta_korp, x_korp, gamma_fuel_korp,
@@ -668,37 +692,25 @@ def start_hw4(hw4_w, d, delta, x_u, x_pu, gamma_fuel, gamma_cool_korp,
            int(num_of_mod_rings.get()), float(qv_kan.get()))
     mb.showinfo('Информация','Данные сохранены в директории ~bin\ФТЯР\HW4',
                 parent=hw4_w)
+'''
 
 
-# создание главного окна и задание его параметров
-root = Tk()
-root.title('Лабораторные работы по ФТЯР на программном комплексе Getera')
-root.resizable(False, False)
-w = root.winfo_screenwidth() # ширина экрана
-h = root.winfo_screenheight() # высота экрана
-w = w//2 # середина экрана
-h = h//2 
-w = w - 450 # смещение от середины
-h = h - 150
-root.geometry('900x300+{}+{}'.format(w, h))
-# создание радиокнопок на главном окне
-var = IntVar()
-var.set(0)
-Radiobutton(text='Лабораторная работа №1', variable=var, value=1).place(relx=0.1, rely=0.1)
-Radiobutton(text='Лабораторная работа №2', variable=var, value=2).place(relx=0.1, rely=0.3)
-Radiobutton(text='Лабораторная работа №3', variable=var, value=3).place(relx=0.1, rely=0.5)
-Radiobutton(text='Лабораторная работа №4', variable=var, value=4).place(relx=0.1, rely=0.7)
-Radiobutton(text='Лабораторная работа №5', variable=var, value=5).place(relx=0.4, rely=0.1)
-Radiobutton(text='Лабораторная работа №6', variable=var, value=6).place(relx=0.4, rely=0.3)
-Radiobutton(text='Лабораторная работа №7', variable=var, value=7).place(relx=0.4, rely=0.5)
-Radiobutton(text='Лабораторная работа №8', variable=var, value=8).place(relx=0.4, rely=0.7)
-Radiobutton(text='Домашняя работа №1', variable=var, value=9).place(relx=0.7, rely=0.1)
-Radiobutton(text='Домашняя работа №2', variable=var, value=10).place(relx=0.7, rely=0.3)
-Radiobutton(text='Домашняя работа №3', variable=var, value=11).place(relx=0.7, rely=0.5)
-Radiobutton(text='Домашняя работа №4', variable=var, value=12).place(relx=0.7, rely=0.7)
-# создание кнопки "Далее" в нижней части главного окна(вызывает функцию
-# config_window, которая отвечает за создание второстепенных окон)
-Button(text='Далее', width=10,bg='lightgrey', command=config_window).place(relx=0.43, rely=0.85)
-# метод запускает главный цикл обработки событий(в том числе отображает главное
-# окно со всем содержимым на экране)
-root.mainloop()
+if __name__ == '__main__':
+    root = tk.Tk()
+    root.title('Лабораторные работы по ФТЯР на программном комплексе Getera')
+    root.resizable(False, False)
+    w = root.winfo_screenwidth() // 2 - 450
+    h = root.winfo_screenheight() // 2 - 150
+    root.geometry('900x300+{}+{}'.format(w, h))
+    var = tk.IntVar()
+    var.set(0)
+    for i in range(8):
+        tk.Radiobutton(text='Лабораторная работа №' + str(i+1), variable=var,
+                       value=1+i).place(relx=0.1+i//4*0.3, rely=0.1+i%4*0.2)
+    for i in range(4):
+        tk.Radiobutton(text='Домашняя работа №' + str(i+1), variable=var,
+                       value=9+i).place(relx=0.7, rely=0.1+i%4*0.2)
+    func = lambda: config_window(var)
+    tk.Button(text='Далее', width=10, bg=bg_color,
+              command=func).place(relx=0.43, rely=0.85)
+    root.mainloop()

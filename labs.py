@@ -9,25 +9,25 @@ import functions as func
 from commands import command
 
 
-def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, R_left, R_right, R_delta):
-    R_array = arange(R_left, R_right, R_delta)
+def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, r_left, r_right, r_delta):
+    r_array = arange(r_left, r_right, r_delta)
     result_dict = {}
-    cool_compos = const.h2o_composition(gamma_cool)
+    cool_comp = const.h2o_composition(gamma_cool)
     func.config('5')
     for x in x_lst:
-        key = 'Обогащение '+str(x)
+        key = 'Обогащение ' + str(x)
         result_dict[key] = {'K': [], 'Phi': [], 'Theta': [],
                             'AbsFuel': [], 'FisFuel': [], 'AbsMod': []}
-        fuel_compos = const.uo2_composition(x, gamma=gamma_fuel)
-        for R in R_array:
+        fuel_comp = const.uo2_composition(x, gamma=gamma_fuel)
+        for r in r_array:
             file_in = open('lab5.txt', 'w')
-            korp.create_file(file_in, d, delta, R, fuel_compos,
-                             cool_compos, [command('fier', None),
-                                           command('macro', '1, 2, 3,')])
+            korp_cell = korp.KorpCell(d, delta, r, fuel_comp, cool_comp)
+            commands = [command('fier', None), command('macro', '1, 2, 3,')]
+            korp_cell.create_file(file_in, commands)
             run('getera.exe')
             func.find_coeff('lab5.out', result_dict[key])
             func.find_macro('lab5.out', result_dict[key])
-    func.draw('Lab5', R_array, result_dict, 'Шаг решетки, см')
+    func.draw('Lab5', r_array, result_dict, 'Шаг решетки, см')
 
 
 def lab6(d, delta, D, Delta, num_of_fuel_rods, x_lst, gamma_fuel,
