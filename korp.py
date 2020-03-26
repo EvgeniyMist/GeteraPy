@@ -10,6 +10,15 @@ import functions as func
 class KorpCell():
 
     def __init__(self, d, delta, r_ex, fuel_comp, cool_comp):
+        '''
+        Задает основные параметры ячейки:
+            d - диаметр ТВЭЛа
+            delta - толщина оболочки ТВЭЛа
+            r_ex - радиус, ограничивающий принадлежащий ТВЭЛу теплоноситель
+            fuel_comp - топливная композиция
+            cool_comp - состав теплоносителя
+        '''
+
         self.d = d
         self.delta = delta
         self.fuel_comp = fuel_comp
@@ -42,13 +51,13 @@ class KorpCell():
             file_in.write(izotop + '\n')
         file_in.write('zr\n')
         for izotop in self.cool_comp:
-            input_str = '*'+izotop+'*' + '\n' if izotop != 'd' else 'd\n'
+            input_str = '*' + izotop + '*' + '\n' if izotop != 'd' else 'd\n'
             file_in.write(input_str)
         file_in.write('****\n')
 
     def create_file(self, file_in, commands):
         '''
-        Создает входной файл для расчета ячейки корпусного реактора
+        Создает входной файл для расчета
 
         Аргументы:
             file_in - файл записи
@@ -63,8 +72,7 @@ class KorpCell():
 
     def calcul_camp(self, commands, result_dict):
         '''
-        Рассчитывает кампанию корпусного реактора и возвращает значения
-        выгорания
+        Рассчитывает кампанию и возвращает значения выгорания
 
         Аргументы:
             commands - необходимые для расчета команды
@@ -87,11 +95,11 @@ class KorpCell():
 
     def find_r_opt_korp(self, r_left=0.5, r_right=1.5, r_delta=0.025):
         '''
-        Вычисляет оптимальный радиус ячейки корпусного реактора
+        Вычисляет оптимальный радиус ячейки
 
         Аргументы:
             r_left, r_right, r_delta - диапазон и шаг прогонки радиуса
-            '''
+        '''
 
         r_array = arange(r_left, r_right+r_delta, r_delta)
         result_dict = {'K': []}

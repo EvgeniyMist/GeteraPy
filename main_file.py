@@ -101,7 +101,7 @@ def config_lab6_window():
         cool = 'h2o' if cool.get() == 1 else 'd2o'
         mod = 'c' if mod.get() == 1 else 'd2o'
         labs.lab6(float(d.get())/10, float(delta.get())/10,
-                  float(d_assembly.get())/10, float(delta_assembly.get())/10,
+                  float(d_assly.get())/10, float(delta_assly.get())/10,
                   int(fuel_rods_num.get()), x_lst, float(gamma_fuel.get()),
                   cool, mod, float(gamma_cool.get()), float(gamma_mod.get()),
                   int(mod_rings_num.get()), float(a_left.get())/10,
@@ -152,14 +152,14 @@ def config_lab6_window():
     x = tk.Entry(main_frame, width=15)
     x.place(x=360, y=10)
     tk.Label(main_frame, text='Диаметр ТВС, мм', bg=bg_color).place(x=10, y=40)
-    d_assembly = tk.Entry(main_frame, width=15)
-    d_assembly.insert(0, '100')
-    d_assembly.place(x=360, y=40)
+    d_assly = tk.Entry(main_frame, width=15)
+    d_assly.insert(0, '100')
+    d_assly.place(x=360, y=40)
     tk.Label(main_frame, text='Толщина оболочки ТВС, мм',
              bg=bg_color).place(x=10, y=70)
-    delta_assembly = tk.Entry(main_frame, width=15)
-    delta_assembly.insert(0, '2.5')
-    delta_assembly.place(x=360, y=70)
+    delta_assly = tk.Entry(main_frame, width=15)
+    delta_assly.insert(0, '2.5')
+    delta_assly.place(x=360, y=70)
     tk.Label(main_frame, text='Количество ТВЭЛов',
              bg=bg_color).place(x=10, y=100)
     fuel_rods_num = tk.Entry(main_frame, width=15)
@@ -192,7 +192,7 @@ def config_lab6_window():
     mod_rings_num.insert(0, '5')
     mod_rings_num.place(x=360, y=220)
 
-    func = lambda: start_lab6(lab6_w, d, delta, d_assembly, delta_assembly,
+    func = lambda: start_lab6(lab6_w, d, delta, d_assly, delta_assly,
                               fuel_rods_num, x, gamma_fuel, cool, mod,
                               gamma_cool, gamma_mod, mod_rings_num, a_left,
                               a_right, a_delta)

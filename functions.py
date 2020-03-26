@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 from os import getcwd
 from subprocess import run
-from numpy import argmax, arange, pi, linspace, mean, interp
+from numpy import linspace, mean, interp
 from scipy.optimize import brentq
 
 import kan
@@ -32,42 +32,6 @@ def camp(qv, time_step, num_of_step, initial_fier=True):
     if initial_fier:
         return [command('fier', None)] + camp
     return camp
-
-
-def camp_kan(d, delta, D, Delta, num_of_fuel_rods, fuel_compos, cool_compos,
-             mod_compos, num_of_mod_rings, commands, result_dict):
-    ''' Рассчитывает кампанию канального реактора
-
-        Аргументы:
-        стандартные параметры канального реактора
-        commands - список команд, задающих кампанию реактора
-        result_dict - стандартный словарь с данными '''
-
-    def continuous_overloads(k_func, right_b):
-        b_array = linspace(0, right_b, 10)
-        mean_k = mean([k_func(b) for b in b_array])
-        return mean_k
-
-    r_opt = find_r_opt_kan(d, delta, D, Delta, num_of_fuel_rods,
-                           fuel_compos, cool_compos, mod_compos,
-                           num_of_mod_rings)
-    file_in = open('lab6.txt', 'w')
-    kan.create_file(file_in, d, delta, r_opt, D, Delta,
-                    num_of_fuel_rods, num_of_mod_rings, fuel_compos,
-                    cool_compos, mod_compos, commands)
-    config('6')
-    run('getera.exe')
-    find_coeff('lab6.out', result_dict)
-    find_concent('lab6.out', result_dict, norm=False)
-    burning_lst = find_burning('lab6.out')
-    k_func = lambda b: interp(b, burning_lst, result_dict['K'])
-    result_func = lambda b: continuous_overloads(k_func, b) - 1
-    try:
-        end_burning = brentq(result_func, 0, max(burning_lst))
-    except ValueError:
-        end_burning = 0
-    clear_data(burning_lst, end_burning, result_dict)
-    return burning_lst
 
 
 def clear_data(burning_lst, end_burning, result_dict):
@@ -285,29 +249,6 @@ def find_macro(name_of_file, result_dict):
         elif '*grp*flux' in line.split():
             flag = True
     result_dict['AbsMod'].append(help_var)
-
-
-def find_r_opt_kan(d, delta, D, Delta, num_of_fuel_rods, fuel_compos,
-                   cool_compos, mod_compos, num_of_mod_rings, a_left=12,
-                   a_right=50, a_delta=1):
-    ''' Возвращает оптимальный эквивалентный радиус ячейки канального реактора
-
-        Аргументы:
-        стандартные параметры канального реактора
-        диапазон и шаг прогонки шага решетки '''
-
-    a_array = arange(a_left, a_right, a_delta)
-    R_array = a_array / pi**0.5
-    result_dict = {'K': []}
-    config('6')
-    for R in R_array:
-        file_in = open('lab6.txt', 'w')
-        kan.create_file(file_in, d, delta, R, D, Delta, num_of_fuel_rods,
-                        num_of_mod_rings, fuel_compos, cool_compos,
-                        mod_compos, [command('fier', None)])
-        run('getera.exe')
-        find_coeff('lab6.out', result_dict)
-    return R_array[argmax(result_dict['K'])]
 
 
 def normalize(data):

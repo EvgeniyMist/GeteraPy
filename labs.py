@@ -30,32 +30,33 @@ def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, r_left, r_right, r_delta):
     func.draw('Lab5', r_array, result_dict, 'Шаг решетки, см')
 
 
-def lab6(d, delta, D, Delta, num_of_fuel_rods, x_lst, gamma_fuel,
-         cool, mod, gamma_cool, gamma_mod, num_of_mod_rings,
+def lab6(d, delta, d_assly, delta_assly, fuel_rods_num, x_lst, gamma_fuel,
+         cool, mod, gamma_cool, gamma_mod, mod_rings_num,
          a_left=12, a_right=50, a_delta=1):
-    # a^2 = pi*R^2 => R = a / sqrt(pi)
+        # a^2 = pi*R^2 => R = a / sqrt(pi)
     a_array = arange(a_left, a_right, a_delta)
-    R_array = a_array / pi ** 0.5
+    r_array = a_array / pi ** 0.5
     result_dict = {}
-    if num_of_fuel_rods == 18:
+    if fuel_rods_num == 18:
         k = 2
-    elif num_of_fuel_rods == 36:
+    elif fuel_rods_num == 36:
         k = 3
-    nbv = ('2, ' + '1, 2, 3, ' * k + '2, ' + '4, ' * num_of_mod_rings)
-    cool_compos = getattr(const, cool+'_composition')(gamma_cool)
-    mod_compos = getattr(const, mod+'_composition')(gamma_mod)
+    nbv = ('2, ' + '1, 2, 3, ' * k + '2, ' + '4, ' * mod_rings_num)
+    cool_comp = getattr(const, cool+'_composition')(gamma_cool)
+    mod_comp = getattr(const, mod+'_composition')(gamma_mod)
     commands = [command('fier', None), command('macro', nbv)]
     func.config('6')
     for x in x_lst:
         key = 'Обогащение '+str(x)
         result_dict[key] = {'K': [], 'Phi': [], 'Theta': [],
                             'AbsFuel': [], 'FisFuel': [], 'AbsMod': []}
-        fuel_compos = const.uo2_composition(x, gamma=gamma_fuel)
-        for R in R_array:
+        fuel_comp = const.uo2_composition(x, gamma=gamma_fuel)
+        for r in r_array:
             file_in = open('lab6.txt', 'w')
-            kan.create_file(file_in, d, delta, R, D, Delta, num_of_fuel_rods,
-                            num_of_mod_rings, fuel_compos, cool_compos,
-                            mod_compos, commands)
+            kan_cell = kan.KanCell(d, delta, fuel_rods_num, d_assly,
+                                   delta_assly, r, mod_rings_num, fuel_comp,
+                                   cool_comp, mod_comp)
+            kan_cell.create_file(file_in, commands)
             run('getera.exe')
             func.find_coeff('lab6.out', result_dict[key])
             func.find_macro('lab6.out', result_dict[key])
