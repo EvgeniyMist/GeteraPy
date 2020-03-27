@@ -1,6 +1,7 @@
 from subprocess import run
-from numpy import pi, linspace, arange, argmax
-from numpy import sqrt
+from numpy import pi, linspace, arange, argmax, mean, sqrt, interp
+from scipy.optimize import brentq
+from collections import namedtuple
 
 from commands import write_commands, command
 from constants import N_zr
@@ -11,6 +12,21 @@ class KanCell():
 
     def __init__(self, d, delta, fuel_rods_num, d_assly, delta_assly, r_out,
                  mod_rings_num, fuel_comp, cool_comp, mod_comp):
+        '''
+        Задает основные параметры ячейки:
+            d - диаметр ТВЭЛа
+            delta - толщина оболочки ТВЭЛа
+            fuel_rods_num - кол-во ТВЭЛов в сборке
+            d_assly - диаметр ТВС
+            delta_assly - толщина оболочки ТВС
+            r_out - эквивалентный внешний радиус ячейки
+            mod_rings_num - кол-во колец, на которое разбивается замедлитель
+            (необходимо для улучшения расчетной модели)
+            fuel_comp - топливная композиция
+            cool_comp - состав теплоносителя
+            mod_comp - состав замедлителя
+        '''
+
         self.d = d
         self.delta = delta
         self.fuel_rods_num = fuel_rods_num
@@ -24,9 +40,18 @@ class KanCell():
         self.fuel_comp = fuel_comp
         self.cool_comp = cool_comp
         self.mod_comp = mod_comp
+        # кол-во ТВЭЛов в одном ряду
+        self.rods_in_row_num = 6
+        # кол-во рядов ТВЭЛов
+        ratio = self.fuel_rods_num/self.rods_in_row_num
+        self.rows_num = int((-1 + sqrt(1 + 8*ratio))/2)
+        # температуры материалов
+        Temp = namedtuple('Temp', ('fuel', 'shell', 'cool', 'mod'))
+        mod_temp = 873 if 'c' in mod_comp else 323
+        self.temp = Temp(1773, 543, 543, mod_temp)
 
     def __write_mod(self, file_in, num):
-        r_array = linspace(self.d_assly/2, self.r_out, self.mod_rings_num+1)
+        r_array = linspace(self.d_assly/2, self.r_out, self.mod_rings_num + 1)
         input_str = '  rcel(1, %d) = ' % num
         for r in r_array:
             input_str += '{:.3f}, '.format(r)
@@ -38,7 +63,7 @@ class KanCell():
 
     def __write_fuel_rod(self, file_in, num, r_ex):
         radii = ('{:.3f}, '*3).format(self.d/2 - self.delta, self.d/2, r_ex)
-        file_in.write(('  rcel(1, %d) = ' + radii + '\n') % num)
+        file_in.write('  rcel(1, %d) = ' % num + radii + '\n')
         file_in.write('  ncelsos(1, %d) = 1, 2, 3,\n' % num)
 
     def __before_concent(self, file_in):
@@ -48,17 +73,13 @@ class KanCell():
         file_in.write('  ncelsos(1, 1) = 2,\n')
         S = pi*(self.d_assly/2 - self.delta_assly)**2  # площадь ТВС
         S /= (self.fuel_rods_num + 1)  # площадь, принадлежащая одному стержню
-        r_ex = (S / pi)**0.5  # S = pi*r_ex^2
-        num_of_rows = (-1 + sqrt(1+8*self.fuel_rods_num/6)) / 2  # кол-во рядов
-        for i in range(int(num_of_rows)):
-            self.__write_fuel_rod(file_in, i+2, r_ex)
-        self.__write_mod(file_in, num_of_rows+2)
-        #########################################################
-        if 'c' in self.mod_comp:
-            file_in.write('  t = 1773.0, 543.0, 543.0, 873.0,\n')
-        else:
-            file_in.write('  t = 1773.0, 543.0, 543.0, 323.0,\n')
-        #########################################################
+        r_ex = (S/pi)**0.5  # S = pi*r_ex^2
+        for i in range(self.rows_num):
+            self.__write_fuel_rod(file_in, i + 2, r_ex)
+        self.__write_mod(file_in, self.rows_num + 2)
+        temp = '  t = %d, %d, %d, %d,\n' % (self.temp.fuel, self.temp.shell,
+                                            self.temp.cool, self.temp.mod)
+        file_in.write(temp)
         file_in.write('  troiz =\n')
 
     def __concent(self, file_in):
@@ -74,19 +95,20 @@ class KanCell():
             file_in.write(input_str)
         for izotop in self.mod_comp:
             if izotop not in self.cool_comp:
-                file_in.write('   0.0, 0.0, 0.0, %e,\n' %
-                              self.mod_comp[izotop])
+                mod_concent = self.mod_comp[izotop]
+                file_in.write('   0.0, 0.0, 0.0, %e,\n' % mod_concent)
 
     def __after_concent(self, file_in):
-        if self.fuel_rods_num == 18:
-            file_in.write('  ntcell = 1, 2, 3, 4,\n')
-            krat_str = '  krat = 1, 6, 12, 1,\n'
-            matrices = open('4x4 matrices.txt')
-        elif self.fuel_rods_num == 36:
-            file_in.write(' ntcell = 1, 2, 3, 4, 5,\n')
-            krat_str = '  krat = 1, 6, 12, 18, 1,\n'
-            matrices = open('5x5 matrices.txt')
-        file_in.write(krat_str)
+        ntcell_str = '  ntcell ='
+        for i in range(self.rows_num + 2):
+            ntcell_str += ' %d,' % (i + 1)
+        file_in.write(ntcell_str + '\n')
+        krat_str = '  krat = 1, '
+        for i in range(self.rows_num):
+            krat_str += '%d, ' % ((i + 1)*self.rods_in_row_num)
+        file_in.write(krat_str + '1,\n')
+        matrices = open('%dx%d matrices.txt' % (self.rows_num + 2,
+                                                self.rows_num + 2))
         for line in matrices:
             file_in.write(line)
         file_in.write("  material(1)='chmc',\n")
@@ -131,10 +153,10 @@ class KanCell():
             mean_k = mean([k_func(b) for b in b_array])
             return mean_k
 
-        r_opt = self.find_r_opt_kan()
+        self.find_r_opt_kan()
         file_in = open('kan.txt', 'w')
         self.create_file(file_in, commands)
-        config('kan')
+        func.config('kan')
         run('getera.exe')
         func.find_coeff('kan.out', result_dict)
         func.find_concent('kan.out', result_dict, norm=False)
@@ -164,4 +186,4 @@ class KanCell():
             self.create_file(file_in, [command('fier', None)])
             run('getera.exe')
             func.find_coeff('kan.out', result_dict)
-        return r_array[argmax(result_dict['K'])]
+        self.r_out = r_array[argmax(result_dict['K'])]

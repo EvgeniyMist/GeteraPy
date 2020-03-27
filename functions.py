@@ -1,10 +1,6 @@
 import matplotlib.pyplot as plt
 from os import getcwd
-from subprocess import run
-from numpy import linspace, mean, interp
-from scipy.optimize import brentq
 
-import kan
 from commands import command
 
 

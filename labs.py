@@ -33,7 +33,7 @@ def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, r_left, r_right, r_delta):
 def lab6(d, delta, d_assly, delta_assly, fuel_rods_num, x_lst, gamma_fuel,
          cool, mod, gamma_cool, gamma_mod, mod_rings_num,
          a_left=12, a_right=50, a_delta=1):
-        # a^2 = pi*R^2 => R = a / sqrt(pi)
+    # a^2 = pi*R^2 => R = a / sqrt(pi)
     a_array = arange(a_left, a_right, a_delta)
     r_array = a_array / pi ** 0.5
     result_dict = {}
