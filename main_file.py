@@ -26,15 +26,14 @@ def config_lab4_window():
 
 def config_lab5_window():
 
-    def start_lab5(lab5_w, d, delta, x, gamma_fuel, gamma_cool, r_left,
-                   r_right, r_delta):
+    def start_lab5():
         x_lst = list(map(float, x.get().split(', ')))
-        labs.lab5(float(d.get())/10, float(delta.get())/10, x_lst,
-                  float(gamma_fuel.get()), float(gamma_cool.get()),
+        labs.lab5(float(d.get())/10, float(delta.get())/10,
                   float(r_left.get())/10, float(r_right.get())/10,
-                  float(r_delta.get())/10)
+                  float(r_delta.get())/10, x_lst,
+                  float(gamma_fuel.get()), float(gamma_cool.get()))
         mb.showinfo('Информация',
-                    'Данные сохранены в директории ~bin\\ФТЯР\\Lab5',
+                    'Данные сохранены в директории ~\\ФТЯР\\Lab5',
                     parent=lab5_w)
 
     lab5_w = tk.Toplevel(bg=bg_color)
@@ -87,27 +86,25 @@ def config_lab5_window():
     r_delta.insert(0, '0.5')
     r_delta.place(x=440, y=115)
 
-    func = lambda: start_lab5(lab5_w, d, delta, x, gamma_fuel, gamma_cool,
-                              r_left, r_right, r_delta)
     tk.Button(lab5_w, width=15, text='Старт', bg='grey',
-              command=func).place(x=220, y=300)
+              command=start_lab5).place(x=220, y=300)
 
 
 def config_lab6_window():
 
-    def start_lab6(lab6_w, d, δ_t, D, δ_tr, N, x, gamma_fuel, cool, mod,
-                   gamma_cool, gamma_mod, n, a_left, a_right, a_delta):
+    def start_lab6():
         x_lst = list(map(float, x.get().split(', ')))
-        cool = 'h2o' if cool.get() == 1 else 'd2o'
-        mod = 'c' if mod.get() == 1 else 'd2o'
+        cool_name = 'h2o' if cool.get() == 1 else 'd2o'
+        mod_name = 'c' if mod.get() == 1 else 'd2o'
         labs.lab6(float(d.get())/10, float(delta.get())/10,
-                  float(d_assly.get())/10, float(delta_assly.get())/10,
-                  int(fuel_rods_num.get()), x_lst, float(gamma_fuel.get()),
-                  cool, mod, float(gamma_cool.get()), float(gamma_mod.get()),
-                  int(mod_rings_num.get()), float(a_left.get())/10,
-                  float(a_right.get())/10, float(a_delta.get())/10)
+                  int(fuel_rods_num.get()), float(d_assly.get())/10,
+                  float(delta_assly.get())/10, float(a_left.get())/10,
+                  float(a_right.get())/10, float(a_delta.get())/10,
+                  int(mod_rings_num.get()), x_lst, float(gamma_fuel.get()),
+                  cool_name, mod_name, float(gamma_cool.get()),
+                  float(gamma_mod.get()))
         mb.showinfo('Информация',
-                    'Данные сохранены в директории ~bin\\ФТЯР\\LAB6',
+                    'Данные сохранены в директории ~\\ФТЯР\\LAB6',
                     parent=lab6_w)
 
     lab6_w = tk.Toplevel(bg=bg_color)
@@ -192,13 +189,8 @@ def config_lab6_window():
     mod_rings_num.insert(0, '5')
     mod_rings_num.place(x=360, y=220)
 
-    func = lambda: start_lab6(lab6_w, d, delta, d_assly, delta_assly,
-                              fuel_rods_num, x, gamma_fuel, cool, mod,
-                              gamma_cool, gamma_mod, mod_rings_num, a_left,
-                              a_right, a_delta)
-
     tk.Button(lab6_w, width=15, text='Старт', bg='grey',
-              command=func).place(x=220, y=445)
+              command=start_lab6).place(x=220, y=445)
 
 '''
 def config_lab7_window():

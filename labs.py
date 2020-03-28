@@ -9,20 +9,21 @@ import functions as func
 from commands import command
 
 
-def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, r_left, r_right, r_delta):
+def lab5(d, delta, r_left, r_right, r_delta, x_lst, gamma_fuel, gamma_cool):
     r_array = arange(r_left, r_right, r_delta)
     result_dict = {}
     cool_comp = const.h2o_composition(gamma_cool)
-    func.config('5')
+    korp_cell = korp.KorpCell(d, delta, None, None, cool_comp)
+    commands = [command('fier', None), command('macro', '1, 2, 3,')]
+    func.config('lab5')
     for x in x_lst:
-        key = 'Обогащение ' + str(x)
+        key = 'Обогащение {:.3f}'.format(x)
         result_dict[key] = {'K': [], 'Phi': [], 'Theta': [],
                             'AbsFuel': [], 'FisFuel': [], 'AbsMod': []}
-        fuel_comp = const.uo2_composition(x, gamma=gamma_fuel)
+        korp_cell.fuel_comp = const.uo2_composition(x, gamma=gamma_fuel)
         for r in r_array:
             file_in = open('lab5.txt', 'w')
-            korp_cell = korp.KorpCell(d, delta, r, fuel_comp, cool_comp)
-            commands = [command('fier', None), command('macro', '1, 2, 3,')]
+            korp_cell.r_ex = r
             korp_cell.create_file(file_in, commands)
             run('getera.exe')
             func.find_coeff('lab5.out', result_dict[key])
@@ -30,32 +31,27 @@ def lab5(d, delta, x_lst, gamma_fuel, gamma_cool, r_left, r_right, r_delta):
     func.draw('Lab5', r_array, result_dict, 'Шаг решетки, см')
 
 
-def lab6(d, delta, d_assly, delta_assly, fuel_rods_num, x_lst, gamma_fuel,
-         cool, mod, gamma_cool, gamma_mod, mod_rings_num,
-         a_left=12, a_right=50, a_delta=1):
-    # a^2 = pi*R^2 => R = a / sqrt(pi)
+def lab6(d, delta, fuel_rods_num, d_assly, delta_assly, a_left, a_right,
+         a_delta, mod_rings_num, x_lst, gamma_fuel, cool, mod, gamma_cool,
+         gamma_mod):
     a_array = arange(a_left, a_right, a_delta)
-    r_array = a_array / pi ** 0.5
+    r_array = a_array/pi**0.5
     result_dict = {}
-    if fuel_rods_num == 18:
-        k = 2
-    elif fuel_rods_num == 36:
-        k = 3
-    nbv = ('2, ' + '1, 2, 3, ' * k + '2, ' + '4, ' * mod_rings_num)
-    cool_comp = getattr(const, cool+'_composition')(gamma_cool)
-    mod_comp = getattr(const, mod+'_composition')(gamma_mod)
+    cool_comp = getattr(const, cool + '_composition')(gamma_cool)
+    mod_comp = getattr(const, mod + '_composition')(gamma_mod)
+    kan_cell = kan.KanCell(d, delta, fuel_rods_num, d_assly, delta_assly, None,
+                           mod_rings_num, None, cool_comp, mod_comp)
+    nbv = '2, ' + '1, 2, 3, '*kan_cell.rows_num + '2, ' + '4, '*mod_rings_num
     commands = [command('fier', None), command('macro', nbv)]
-    func.config('6')
+    func.config('lab6')
     for x in x_lst:
-        key = 'Обогащение '+str(x)
+        key = 'Обогащение {:.3f}'.format(x)
         result_dict[key] = {'K': [], 'Phi': [], 'Theta': [],
                             'AbsFuel': [], 'FisFuel': [], 'AbsMod': []}
-        fuel_comp = const.uo2_composition(x, gamma=gamma_fuel)
+        kan_cell.fuel_comp = const.uo2_composition(x, gamma=gamma_fuel)
         for r in r_array:
             file_in = open('lab6.txt', 'w')
-            kan_cell = kan.KanCell(d, delta, fuel_rods_num, d_assly,
-                                   delta_assly, r, mod_rings_num, fuel_comp,
-                                   cool_comp, mod_comp)
+            kan_cell.r_out = r
             kan_cell.create_file(file_in, commands)
             run('getera.exe')
             func.find_coeff('lab6.out', result_dict[key])

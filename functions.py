@@ -47,9 +47,11 @@ def clear_data(burning_lst, end_burning, result_dict):
             return
 
 
-def config(num):
-    ''' Перезаписывает config файл, указывая в качестве входного и выходного
-        файлов labn.txt и labn.out соответственно, где n - получаемый номер '''
+def config(name):
+    '''
+    Перезаписывает config файл, указывая в качестве входного и выходного
+    файлов name.txt и name.out соответственно, где n - получаемое имя
+    '''
 
     config_file = open('CONFIG.DRV', 'r')
     help_list = []
@@ -59,9 +61,9 @@ def config(num):
     config_file = open('CONFIG.DRV', 'w')
     for i, line in enumerate(help_list):
         if i == 8:
-            config_file.write('INGET:lab' + num + '.txt\n')
+            config_file.write('INGET:%s.txt\n' % name)
         elif i == 9:
-            config_file.write('OUTGET:lab' + num + '.out\n')
+            config_file.write('OUTGET:%s.out\n' % name)
         else:
             config_file.write(line)
     config_file.close()
