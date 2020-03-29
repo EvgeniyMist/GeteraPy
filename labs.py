@@ -3,17 +3,16 @@ from numpy import arange, linspace, pi, exp, concatenate, interp
 from scipy.optimize import brentq
 
 import constants as const
-import korp
-import kan
 import functions as func
 from commands import command
+import reactors as react
 
 
 def lab5(d, delta, r_left, r_right, r_delta, x_lst, gamma_fuel, gamma_cool):
     r_array = arange(r_left, r_right, r_delta)
     result_dict = {}
     cool_comp = const.h2o_composition(gamma_cool)
-    korp_cell = korp.KorpCell(d, delta, None, None, cool_comp)
+    korp_cell = react.KorpCell(d, delta, None, None, cool_comp)
     commands = [command('fier', None), command('macro', '1, 2, 3,')]
     func.config('lab5')
     for x in x_lst:
@@ -39,8 +38,8 @@ def lab6(d, delta, fuel_rods_num, d_assly, delta_assly, a_left, a_right,
     result_dict = {}
     cool_comp = getattr(const, cool + '_composition')(gamma_cool)
     mod_comp = getattr(const, mod + '_composition')(gamma_mod)
-    kan_cell = kan.KanCell(d, delta, fuel_rods_num, d_assly, delta_assly, None,
-                           mod_rings_num, None, cool_comp, mod_comp)
+    kan_cell = react.KanCell(d, delta, fuel_rods_num, d_assly, delta_assly,
+                             None, mod_rings_num, None, cool_comp, mod_comp)
     nbv = '2, ' + '1, 2, 3, '*kan_cell.rows_num + '2, ' + '4, '*mod_rings_num
     commands = [command('fier', None), command('macro', nbv)]
     func.config('lab6')
