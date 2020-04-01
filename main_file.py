@@ -33,7 +33,7 @@ def config_lab5_window():
                   float(r_delta.get())/10, x_lst,
                   float(gamma_fuel.get()), float(gamma_cool.get()))
         mb.showinfo('Информация',
-                    'Данные сохранены в директории ~\\ФТЯР\\Lab5',
+                    'Данные сохранены в директории ~lab5_result',
                     parent=lab5_w)
 
     lab5_w = tk.Toplevel(bg=bg_color)
@@ -96,6 +96,7 @@ def config_lab6_window():
         x_lst = list(map(float, x.get().split(', ')))
         cool_name = 'h2o' if cool.get() == 1 else 'd2o'
         mod_name = 'c' if mod.get() == 1 else 'd2o'
+        print(cool_name, mod_name)
         labs.lab6(float(d.get())/10, float(delta.get())/10,
                   int(fuel_rods_num.get()), float(d_assly.get())/10,
                   float(delta_assly.get())/10, float(a_left.get())/10,
@@ -104,7 +105,7 @@ def config_lab6_window():
                   cool_name, mod_name, float(gamma_cool.get()),
                   float(gamma_mod.get()))
         mb.showinfo('Информация',
-                    'Данные сохранены в директории ~\\ФТЯР\\LAB6',
+                    'Данные сохранены в директории ~lab6_result',
                     parent=lab6_w)
 
     lab6_w = tk.Toplevel(bg=bg_color)

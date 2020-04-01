@@ -3,7 +3,6 @@ from collections import namedtuple
 from numpy import pi, linspace, arange, argmax, mean, sqrt, interp
 from scipy.optimize import brentq
 
-from commands import write_commands, command
 from constants import N_zr
 import functions as func
 
@@ -28,32 +27,32 @@ class KorpCell():
         self.fuel_comp = fuel_comp
         self.cool_comp = cool_comp
         self.r_ex = r_ex
+        # температуры материалов
         Temp = namedtuple('Temp', ('fuel', 'shell', 'cool'))
         self.temp = Temp(1000, 600, 579)
+        # наименование вспомогательного файла
+        self.file_name = 'korp'
 
     def __after_concent(self, file_in):
         file_in.write("  material(1) = 'chmc',\n")
         file_in.write(' &end\n')
         for izotop in self.fuel_comp:
-            file_in.write(izotop + '\n')
+            file_in.write('%s\n' % izotop)
         file_in.write('zr\n')
         for izotop in self.cool_comp:
-            input_str = '*' + izotop + '*' + '\n' if izotop != 'd' else 'd\n'
-            file_in.write(input_str)
+            file_in.write('*%s*\n' % izotop if izotop != 'd' else 'd\n')
         file_in.write('****\n')
 
     def __before_concent(self, file_in):
         file_in.write(':poly\n')
         file_in.write(' &vvod\n')
         file_in.write('  nsos = 1, 2, 3,\n')
-        r_str = '  r = '
-        r_str += (('{:.3f}, '*2).format(self.d/2 - self.delta, self.d/2) +
-                  '{:.3f},\n'.format(self.r_ex))
-        file_in.write(r_str)
-        temp = '  t = '
-        temp += ('{:.1f}, {:.1f}, '.format(self.temp.fuel, self.temp.shell) +
-                 '{:.1f},\n'.format(self.temp.cool))
-        file_in.write(temp)
+        r_in = self.d/2 - self.delta
+        input_str = ('{:.3f}, '*3).format(r_in, self.d/2, self.r_ex)
+        file_in.write('  r = %s\n' % input_str)
+        input_str = ('{:.1f}, '*3).format(self.temp.fuel, self.temp.shell,
+                                          self.temp.cool)
+        file_in.write('  t = %s\n' % input_str)
         file_in.write('  troiz =\n')
 
     def __concent(self, file_in):
@@ -75,7 +74,7 @@ class KorpCell():
         self.__before_concent(file_in)
         self.__concent(file_in)
         self.__after_concent(file_in)
-        write_commands(file_in, commands)
+        func.write_commands(file_in, commands)
         file_in.close()
 
     def find_r_opt(self, r_left=0.5, r_right=1.5, r_delta=0.025):
@@ -88,32 +87,33 @@ class KorpCell():
 
         r_array = arange(r_left, r_right + r_delta, r_delta)
         result_dict = {'K': []}
-        func.config('korp')
+        func.change_config(self.file_name)
         for r in r_array:
-            file_in = open('korp.txt', 'w')
+            file_in = open('%s.txt' % self.file_name, 'w')
             self.r_ex = r
-            self.create_file(file_in, [command('fier', None)])
+            self.create_file(file_in, [func.Command('fier', None)])
             run('getera.exe', check=True)
-            func.find_coeff('korp.out', result_dict)
+            func.find_coeff('%s.out' % self.file_name, result_dict)
         self.r_ex = r_array[argmax(result_dict['K'])]
 
     def calcul_camp(self, commands, result_dict):
         '''
-        Рассчитывает кампанию и возвращает значения выгорания
+        Рассчитывает кампанию, производя записи значений коэффициента
+        размножения нейтронов и концентраций заданных изотопов в переданную
+        структуру данных и возвращает значения выгорания
 
         Аргументы:
             commands - необходимые для расчета команды
             result_dict - стандартный словарь для результатов
         '''
 
-        file_in = open('korp.txt', 'w')
-        self.find_r_opt()
+        file_in = open('%s.txt' % self.file_name, 'w')
         self.create_file(file_in, commands)
-        func.config('korp')
+        func.change_config(self.file_name)
         run('getera.exe', check=True)
-        func.find_coeff('korp.out', result_dict)
-        func.find_concent('korp.out', result_dict, norm=False)
-        burning_lst = func.find_burning('korp.out')
+        func.find_coeff('%s.out' % self.file_name, result_dict)
+        func.find_concent('%s.out' % self.file_name, result_dict, norm=False)
+        burning_lst = func.find_burning('%s.out' % self.file_name)
         # определяем максимальное выгорание исходя из 3-ех перегрузок
         k_func = lambda b: interp(b, burning_lst, result_dict['K'])
         result_func = lambda b: k_func(b) + k_func(2*b) + k_func(3*b) - 3
@@ -128,7 +128,7 @@ def continuous_overloads(k_func, right_b, points_num=100):
     среднее значение на отрезке [0, right_b]
 
     Опциональные аргументы:
-        points_num - кол-во точек для вчисления среднего значения
+        points_num - кол-во точек для вычисления среднего значения
     '''
 
     b_array = linspace(0, right_b, points_num)
@@ -177,30 +177,32 @@ class KanCell():
         Temp = namedtuple('Temp', ('fuel', 'shell', 'cool', 'mod'))
         mod_temp = 873 if 'c' in mod_comp else 323
         self.temp = Temp(1773, 543, 543, mod_temp)
+        # наименование вспомогательного файла
+        self.file_name = 'kan'
 
     def __after_concent(self, file_in):
-        ntcell_str = '  ntcell ='
+        input_str = '  ntcell ='
         for i in range(self.rows_num + 2):
-            ntcell_str += ' %d,' % (i + 1)
-        file_in.write(ntcell_str + '\n')
-        krat_str = '  krat = 1, '
+            input_str += ' %d,' % (i + 1)
+        file_in.write('%s\n' % input_str)
+        input_str = '  krat = 1, '
         for i in range(self.rows_num):
-            krat_str += '%d, ' % ((i + 1)*self.rods_in_row_num)
-        file_in.write(krat_str + '1,\n')
-        matrices = open('%dx%d matrices.txt' % (self.rows_num + 2,
-                                                self.rows_num + 2))
+            input_str += '%d, ' % ((i + 1)*self.rods_in_row_num)
+        file_in.write('%s1,\n' % input_str)
+        dim = self.rows_num + 2
+        matrices = open('%dx%d matrices.txt' % (dim, dim))
         for line in matrices:
             file_in.write(line)
         file_in.write("  material(1)='chmc',\n")
         file_in.write(' &end\n')
         for izotop in self.fuel_comp:
-            file_in.write(izotop + '\n')
+            file_in.write('%s\n' % izotop)
         file_in.write('zr\n')
         comp = {}
         comp.update(self.cool_comp)
         comp.update(self.mod_comp)
         for izotop in comp:
-            input_str = '*' + izotop + '*' + '\n' if izotop != 'd' else 'd\n'
+            input_str = '*%s*\n' % izotop if izotop != 'd' else 'd\n'
             file_in.write(input_str)
         file_in.write('****\n')
 
@@ -214,10 +216,9 @@ class KanCell():
         for i in range(self.rows_num):
             self.__write_fuel_rod(file_in, i + 2, r_ex)
         self.__write_mod(file_in, self.rows_num + 2)
-        temp = '  t = '
-        temp += ('{:.1f}, {:.1f},'.format(self.temp.fuel, self.temp.shell) +
-                 '{:.1f}, {:.1f},\n'.format(self.temp.cool, self.temp.mod))
-        file_in.write(temp)
+        input_str = ('{:.1f}, '*4).format(self.temp.fuel, self.temp.shell,
+                                          self.temp.cool, self.temp.mod)
+        file_in.write('  t = %s\n' % input_str)
         file_in.write('  troiz =\n')
 
     def __concent(self, file_in):
@@ -238,7 +239,7 @@ class KanCell():
 
     def __write_fuel_rod(self, file_in, num, r_ex):
         radii = ('{:.3f}, '*3).format(self.d/2 - self.delta, self.d/2, r_ex)
-        file_in.write('  rcel(1, %d) = ' % num + radii + '\n')
+        file_in.write('  rcel(1, %d) = %s\n' % (num, radii))
         file_in.write('  ncelsos(1, %d) = 1, 2, 3,\n' % num)
 
     def __write_mod(self, file_in, num):
@@ -247,10 +248,10 @@ class KanCell():
         for r in r_array:
             input_str += '{:.3f}, '.format(r)
         r_inner = self.d_assly/2 - self.delta_assly
-        input_str += 'rcin(%d)' % num + ' = {:.3f},\n'.format(r_inner)
+        input_str += 'rcin({}) = {:.3f},\n'.format(num, r_inner)
         file_in.write(input_str)
-        file_in.write('  ncelsos(1, %d) = 2, ' % num +
-                      '4, '*self.mod_rings_num + '\n')
+        input_str = '2, ' + '4, '*self.mod_rings_num
+        file_in.write('  ncelsos(1, %d) = %s\n' % (num, input_str))
 
     def create_file(self, file_in, commands):
         '''
@@ -264,7 +265,7 @@ class KanCell():
         self.__before_concent(file_in)
         self.__concent(file_in)
         self.__after_concent(file_in)
-        write_commands(file_in, commands)
+        func.write_commands(file_in, commands)
         file_in.close()
 
     def find_r_opt(self, a_left=12, a_right=50, a_delta=1):
@@ -278,33 +279,34 @@ class KanCell():
         a_array = arange(a_left, a_right + a_delta, a_delta)
         r_array = a_array/pi**0.5
         result_dict = {'K': []}
-        func.config('kan')
+        func.change_config(self.file_name)
         for r in r_array:
-            file_in = open('kan.txt', 'w')
+            file_in = open('%s.txt' % self.file_name, 'w')
             self.r_out = r
-            self.create_file(file_in, [command('fier', None)])
+            self.create_file(file_in, [func.Command('fier', None)])
             run('getera.exe', check=True)
-            func.find_coeff('kan.out', result_dict)
+            func.find_coeff('%s.out' % self.file_name, result_dict)
         self.r_out = r_array[argmax(result_dict['K'])]
 
-    def camp_kan(self, commands, result_dict):
+    def calcul_camp(self, commands, result_dict):
         '''
-        Рассчитывает кампанию и возвращает значения выгорания
+        Рассчитывает кампанию, производя записи значений коэффициента
+        размножения нейтронов и концентраций заданных изотопов в переданную
+        структуру данных и возвращает значения выгорания
 
         Аргументы:
             commands - необходимые для расчета команды
             result_dict - стандартный словарь для результатов
         '''
 
-        file_in = open('kan.txt', 'w')
-        self.find_r_opt()
+        file_in = open('%s.txt' % self.file_name, 'w')
         self.create_file(file_in, commands)
-        func.config('kan')
+        func.change_config(self.file_name)
         run('getera.exe', check=True)
-        func.find_coeff('kan.out', result_dict)
-        func.find_concent('kan.out', result_dict, norm=False)
+        func.find_coeff('%s.out' % self.file_name, result_dict)
+        func.find_concent('%s.out' % self.file_name, result_dict, norm=False)
         # определяем максимальное выгорание исходя из непрерывых перегрузок
-        burning_lst = func.find_burning('kan.out')
+        burning_lst = func.find_burning('%s.out' % self.file_name)
         k_func = lambda b: interp(b, burning_lst, result_dict['K'])
         result_func = lambda b: continuous_overloads(k_func, b) - 1
         end_burning = brentq(result_func, 0, max(burning_lst))

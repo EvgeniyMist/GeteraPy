@@ -4,7 +4,6 @@ from scipy.optimize import brentq
 
 import constants as const
 import functions as func
-from commands import command
 import reactors as react
 
 
@@ -13,8 +12,8 @@ def lab5(d, delta, r_left, r_right, r_delta, x_lst, gamma_fuel, gamma_cool):
     result_dict = {}
     cool_comp = const.h2o_composition(gamma_cool)
     korp_cell = react.KorpCell(d, delta, None, None, cool_comp)
-    commands = [command('fier', None), command('macro', '1, 2, 3,')]
-    func.config('lab5')
+    commands = [func.Command('fier', None), func.Command('macro', '1, 2, 3,')]
+    func.change_config('lab5')
     for x in x_lst:
         key = 'Обогащение {:.3f}'.format(x)
         result_dict[key] = {'K': [], 'Phi': [], 'Theta': [],
@@ -27,7 +26,7 @@ def lab5(d, delta, r_left, r_right, r_delta, x_lst, gamma_fuel, gamma_cool):
             run('getera.exe')
             func.find_coeff('lab5.out', result_dict[key])
             func.find_macro('lab5.out', result_dict[key])
-    func.draw('Lab5', r_array, result_dict, 'Шаг решетки, см')
+    func.draw('lab5_result', r_array, result_dict, 'Шаг решетки, см')
 
 
 def lab6(d, delta, fuel_rods_num, d_assly, delta_assly, a_left, a_right,
@@ -36,13 +35,13 @@ def lab6(d, delta, fuel_rods_num, d_assly, delta_assly, a_left, a_right,
     a_array = arange(a_left, a_right, a_delta)
     r_array = a_array/pi**0.5
     result_dict = {}
-    cool_comp = getattr(const, cool + '_composition')(gamma_cool)
-    mod_comp = getattr(const, mod + '_composition')(gamma_mod)
+    cool_comp = getattr(const, '%s_composition' % cool)(gamma_cool)
+    mod_comp = getattr(const, '%s_composition' % mod)(gamma_mod)
     kan_cell = react.KanCell(d, delta, fuel_rods_num, d_assly, delta_assly,
                              None, mod_rings_num, None, cool_comp, mod_comp)
     nbv = '2, ' + '1, 2, 3, '*kan_cell.rows_num + '2, ' + '4, '*mod_rings_num
-    commands = [command('fier', None), command('macro', nbv)]
-    func.config('lab6')
+    commands = [func.Command('fier', None), func.Command('macro', nbv)]
+    func.change_config('lab6')
     for x in x_lst:
         key = 'Обогащение {:.3f}'.format(x)
         result_dict[key] = {'K': [], 'Phi': [], 'Theta': [],
@@ -55,7 +54,7 @@ def lab6(d, delta, fuel_rods_num, d_assly, delta_assly, a_left, a_right,
             run('getera.exe')
             func.find_coeff('lab6.out', result_dict[key])
             func.find_macro('lab6.out', result_dict[key])
-    func.draw('Lab6', a_array, result_dict, 'Шаг решетки, см')
+    func.draw('lab6_result', a_array, result_dict, 'Шаг решетки, см')
 
 
 def lab7(d_korp, delta_korp, x_korp, gamma_fuel_korp, gamma_cool_korp, qv_korp,
