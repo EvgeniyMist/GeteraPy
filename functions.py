@@ -54,7 +54,7 @@ def clear_data(burning_lst, end_burning, result_dict):
 
     index = where(array(burning_lst) > end_burning)[0][0]
     for var in result_dict:
-        result_dict[var] = result_dict[var][:index]
+        result_dict[var] = result_dict[var][:index+1]
     while len(burning_lst) != index:
         burning_lst.pop()
 
@@ -288,19 +288,24 @@ def find_macro(name_of_file, result_dict):
     result_dict['AbsMod'].append(help_var)
 
 
-def normalize(data):
+def normalize(data, max_c_dict=None):
     '''
     Производит нормировку концентраций изотопов,
     находящихся в переданной структуре данных
 
     Аргументы:
         data - стандартный словарь с данными
+        max_c_dict - структура данных, содержащая значения концентраций, на
+                     которые будет произведена нормировка
     '''
 
     for izotop in izotops:
         if izotop in data:
-            max_c = max(data[izotop])
-            data[izotop] = list(map(lambda c: c / max_c, data[izotop]))
+            if max_c_dict is None:
+                max_c = max(data[izotop])
+            else:
+                max_c = max_c_dict[izotop]
+            data[izotop] = list(map(lambda c: c/max_c, data[izotop]))
 
 
 def write_commands(file_in, commands):
