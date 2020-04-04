@@ -23,7 +23,7 @@ izotops = ['xe35', 'u235', 'pu38', 'pu39', 'pu40', 'pu41', 'pu42']
 Command = namedtuple('command', ['name', 'data'])
 
 
-def camp(qv, time_step, num_of_step, initial_fier=True):
+def camp(qv, time_step, num_of_steps, initial_fier=True):
     '''
     Возвращает список команд, необходимых для расчета кампании реактора
 
@@ -36,7 +36,7 @@ def camp(qv, time_step, num_of_step, initial_fier=True):
     '''
 
     commands = [Command('burn', {'qv': str(qv), 'dtim': str(time_step)}),
-                Command('corr', None), Command('fier', None)]*num_of_step
+                Command('corr', None), Command('fier', None)]*num_of_steps
     if initial_fier:
         return [Command('fier', None)] + commands
     return commands
@@ -54,7 +54,7 @@ def clear_data(burning_lst, end_burning, result_dict):
 
     index = where(array(burning_lst) > end_burning)[0][0]
     for var in result_dict:
-        result_dict[var] = result_dict[var][:index+1]
+        result_dict[var] = result_dict[var][:index]
     while len(burning_lst) != index:
         burning_lst.pop()
 
@@ -316,8 +316,8 @@ def write_commands(file_in, commands):
 
     def burn(file_in, data):
         file_in.write(':burn\n')
-        file_in.write(' &vvod qv=' + data['qv'] + ' dtim=' + data['dtim'] +
-                      ' &end\n')
+        file_in.write(' &vvod qv = %s dtim = %s &end\n' % (data['qv'],
+                                                           data['dtim']))
 
     def corr(file_in, data):
         file_in.write(':corr\n')
@@ -331,7 +331,7 @@ def write_commands(file_in, commands):
         file_in.write(':macro\n')
         file_in.write(' &vvod\n')
         file_in.write('  ET = 10.5e+6,2.15, 2.15,0.,\n')
-        file_in.write('  NBV = ' + data + '\n')
+        file_in.write('  NBV = %s\n' % data)
         file_in.write(' &end\n')
 
     for cmd in commands:

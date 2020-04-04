@@ -117,7 +117,7 @@ class KorpCell():
         # определяем максимальное выгорание исходя из 3-ех перегрузок
         k_func = lambda b: interp(b, burning_lst, result_dict['K'])
         result_func = lambda b: k_func(b) + k_func(2*b) + k_func(3*b) - 3
-        end_burning = 3*brentq(result_func, 0, max(burning_lst))
+        end_burning = 3*brentq(result_func, 1, burning_lst[-1])
         func.clear_data(burning_lst, end_burning, result_dict)
         return burning_lst
 
@@ -309,6 +309,6 @@ class KanCell():
         burning_lst = func.find_burning('%s.out' % self.file_name)
         k_func = lambda b: interp(b, burning_lst, result_dict['K'])
         result_func = lambda b: continuous_overloads(k_func, b) - 1
-        end_burning = brentq(result_func, 0, max(burning_lst))
+        end_burning = brentq(result_func, 1, burning_lst[-1])
         func.clear_data(burning_lst, end_burning, result_dict)
         return burning_lst
