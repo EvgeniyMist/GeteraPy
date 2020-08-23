@@ -1,7 +1,15 @@
-*
-!.gitignore
-!README.md
-!CHANGELOG
-!4x4 matrices.txt
-!5x5 matrices.txt
-!*.py
+# bytecode folder
+**/__pycache__
+
+# директория с исполняемым файлом getera.exe
+**/bin
+
+# директория для хранения результатов расчета
+**/results
+
+# директория среды разработки
+**/.vscode
+
+# тестовые файлы
+test.ans
+test.out
