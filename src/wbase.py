@@ -229,8 +229,8 @@ F11:f11\n'''
             file_in.write(':%s\n' % cmd.name)
             file_in.write(' &vvod\n')
             if cmd.name == 'burn':
-                file_in.write('  qv = %d\n' % cmd.data['qv'])
-                file_in.write('  dtim = %d\n' % cmd.data['dtim'])
+                file_in.write('  qv = {:.2f}\n'.format(cmd.data['qv']))
+                file_in.write('  dtim = {:.2f}\n'.format(cmd.data['dtim']))
             elif cmd.name == 'macro':
                 input_str = '  ET = '
                 for pair in cmd.data['ET']:
@@ -321,7 +321,7 @@ class KanCell(Cell):
 
     __FACTOR = 6  # количество ТВЭЛов в "рядах": n, 2n, 3n, где n <=> FACTOR
 
-    __MATR_PATH = '{}{s}..{s}data'.format(FILE_PATH, s=sep)
+    __MATR_PATH = '{}{s}..{s}data{s}%dx%d matrices.txt'.format(FILE_PATH, s=sep)
 
     @property
     def mod(self):
@@ -436,8 +436,7 @@ class KanCell(Cell):
 
     def __write_matr(self, file_in):
         dim = self.__num_of_rows + 2
-        file_name = '%dx%d matrices.txt' % (dim, dim)
-        matrices = open(self.__MATR_PATH + sep + file_name)
+        matrices = open(self.__MATR_PATH % (dim, dim))
         for line in matrices:
             file_in.write(line)
         matrices.close()
