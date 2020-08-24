@@ -5,7 +5,6 @@
 
 
 from os import path, sep
-from importlib.util import module_from_spec, spec_from_file_location
 from subprocess import DEVNULL, run
 from warnings import warn
 from copy import deepcopy
@@ -14,11 +13,7 @@ from collections import namedtuple
 from numpy import argmax, interp, linspace, pi, sqrt
 from scipy.optimize import brentq
 
-FILE_PATH = path.dirname(path.abspath(__file__))
-
-spec = spec_from_file_location('rbase', '{}{}rbase.py'.format(FILE_PATH, sep))
-rbase = module_from_spec(spec)
-spec.loader.exec_module(rbase)
+import rbase
 
 
 # цирконий
@@ -43,7 +38,15 @@ num_of_steps = %d'''
 
     __WORK_FOLDER = 'work_dir' + sep
 
-    bin_path = '{}{s}..{s}bin'.format(FILE_PATH, s=sep)
+    @property
+    def bin_path(self):
+        ''' путь к директории с исполняемым файлом getera.exe '''
+
+        return self.__bin_path
+
+    @bin_path.setter
+    def bin_path(self, value):
+        self.__bin_path = value
 
     @property
     def cool(self):
@@ -178,6 +181,7 @@ F11:f11\n'''
             commands : list<Command> - необходимые для расчета команды
         '''
 
+
         file_in_path = self.bin_path + sep + self.__WORK_FOLDER + self.inp_file
         with open(file_in_path, 'w') as file_in:
             self._before_concent(file_in)
@@ -229,8 +233,8 @@ F11:f11\n'''
             file_in.write(':%s\n' % cmd.name)
             file_in.write(' &vvod\n')
             if cmd.name == 'burn':
-                file_in.write('  qv = %d\n' % cmd.data['qv'])
-                file_in.write('  dtim = %d\n' % cmd.data['dtim'])
+                file_in.write('  qv = {:.2f}\n'.format(cmd.data['qv']))
+                file_in.write('  dtim = {:.2f}\n'.format(cmd.data['dtim']))
             elif cmd.name == 'macro':
                 input_str = '  ET = '
                 for pair in cmd.data['ET']:
@@ -321,7 +325,8 @@ class KanCell(Cell):
 
     __FACTOR = 6  # количество ТВЭЛов в "рядах": n, 2n, 3n, где n <=> FACTOR
 
-    __MATR_PATH = '{}{s}..{s}data'.format(FILE_PATH, s=sep)
+    __MATR_PATH = (path.dirname(path.abspath(__file__)) + sep +
+                   '%dx%d matrices.txt')
 
     @property
     def mod(self):
@@ -436,8 +441,7 @@ class KanCell(Cell):
 
     def __write_matr(self, file_in):
         dim = self.__num_of_rows + 2
-        file_name = '%dx%d matrices.txt' % (dim, dim)
-        matrices = open(self.__MATR_PATH + sep + file_name)
+        matrices = open(self.__MATR_PATH % (dim, dim))
         for line in matrices:
             file_in.write(line)
         matrices.close()

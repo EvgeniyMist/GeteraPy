@@ -262,8 +262,9 @@ D   - коэффициент диффузии'''
         for line in out_file:
             if line[:5] == ':burn':
                 next(out_file)
+                next(out_file)
                 self.bt_dict['time'].append(self.bt_dict['time'][-1] +
-                                            int(next(out_file).split()[2]))
+                                            float(next(out_file).split()[2]))
             elif line[:5] == ':stop':
                 break
         for line in out_file:
